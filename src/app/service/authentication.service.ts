@@ -58,4 +58,25 @@ export class AuthenticationService {
     localStorage.setItem('user', JSON.stringify(user));
   }
 
+  /**
+   * Load Token from local storage
+   */
+  public loadToken(): void {
+    this.token = localStorage.getItem('token') || '';
+  }
+
+  /**
+   * get Token
+   */
+  public getToken(): string {
+    return this.token;
+  }
+
+  /**
+   * Get User from local storage
+   */
+  public getUserFromLocalStorage(): User {
+    return JSON.parse(localStorage.getItem('user') || '{}');
+  }
+
 }
