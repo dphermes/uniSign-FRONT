@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient, HttpErrorResponse, HttpEvent} from "@angular/common/http";
 import {Observable} from "rxjs";
-import { User } from "../model/user";
+import {User} from "../model/user";
+import {CustomHttpResponse} from "../model/custom-http-response";
 
 @Injectable({
   providedIn: 'root'
@@ -42,8 +43,8 @@ export class UserService {
    * Reset user's password service (http call)
    * @return User: updated user or HttpErrorResponse
    */
-  public resetPassword(email: string): Observable<any | HttpErrorResponse> {
-    return this.http.get(`${this.host}/user/reset-password/${email}`);
+  public resetPassword(email: string): Observable<CustomHttpResponse | HttpErrorResponse> {
+    return this.http.get<CustomHttpResponse>(`${this.host}/user/reset-password/${email}`);
   }
 
   /**
@@ -61,8 +62,8 @@ export class UserService {
   /**
    * Delete user service (http call)
    */
-  public deleteUser(userId: number): Observable<any | HttpErrorResponse> {
-    return this.http.delete<any>(`${this.host}/user/delete/${userId}`);
+  public deleteUser(userId: number): Observable<CustomHttpResponse | HttpErrorResponse> {
+    return this.http.delete<CustomHttpResponse>(`${this.host}/user/delete/${userId}`);
   }
 
   /**
