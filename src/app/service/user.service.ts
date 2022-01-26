@@ -15,9 +15,17 @@ export class UserService {
 
   /**
    * Fetch all users from API
-   * @return User[]: list of all users
+   * @return User[]: list of all users or HttpErrorResponse
    */
   public getUsers(): Observable<User[] | HttpErrorResponse> {
     return this.http.get<User[]>(`${this.host}/user/all`);
+  }
+
+  /**
+   * Add a user to the database
+   * @return User: added user or HttpErrorResponse
+   */
+  public addUser(formData: FormData): Observable<User | HttpErrorResponse> {
+    return this.http.post<User>(`${this.host}/user/add`, formData);
   }
 }
