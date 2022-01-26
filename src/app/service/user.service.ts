@@ -14,7 +14,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   /**
-   * Fetch all users from API
+   * Fetch all users service (http call)
    * @return User[]: list of all users or HttpErrorResponse
    */
   public getUsers(): Observable<User[] | HttpErrorResponse> {
@@ -22,7 +22,7 @@ export class UserService {
   }
 
   /**
-   * Add a user to the database
+   * Add a user service (http call)
    * @return User: added user or HttpErrorResponse
    */
   public addUser(formData: FormData): Observable<User | HttpErrorResponse> {
@@ -30,10 +30,18 @@ export class UserService {
   }
 
   /**
-   * Update a user to the database
+   * Update a user service (http call)
    * @return User: updated user or HttpErrorResponse
    */
   public updateUser(formData: FormData): Observable<User | HttpErrorResponse> {
     return this.http.post<User>(`${this.host}/user/update`, formData);
+  }
+
+  /**
+   * Reset user's password service (http call)
+   * @return User: updated user or HttpErrorResponse
+   */
+  public resetPassword(email: string): Observable<any | HttpErrorResponse> {
+    return this.http.get(`${this.host}/user/reset-password/${email}`);
   }
 }
