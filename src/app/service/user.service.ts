@@ -56,4 +56,12 @@ export class UserService {
         observe: 'events'
       });
   }
+
+  /**
+   * Delete user service (http call)
+   * @return User: updated user or HttpErrorResponse
+   */
+  public deleteUser(userId: number): Observable<any | HttpErrorResponse> {
+    return this.http.delete<any>(`${this.host}/user/delete/${userId}`);
+  }
 }
