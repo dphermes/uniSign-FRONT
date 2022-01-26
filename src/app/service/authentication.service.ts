@@ -10,6 +10,8 @@ import { User } from "../model/user";
 export class AuthenticationService {
 
   private host = environment.apiUrl;
+  private token = '';
+  private loggedInUsername = '';
 
   constructor(private http: HttpClient) { }
 
@@ -27,9 +29,18 @@ export class AuthenticationService {
    * @param user User: Whole user object
    */
   public register(user: User): Observable<User | HttpErrorResponse> {
-    // Observe the whole response instead of the body to fetch the headers with the Jwt Token
     return this.http.post<User | HttpErrorResponse>(`${this.host}/user/register`, user, {observe: 'response'});
   }
 
+  /**
+   * Logout User and clean local storage
+   */
+  public logout(): void {
+    this.token = '';
+    this.loggedInUsername = '';
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('users');
+  }
 
 }
