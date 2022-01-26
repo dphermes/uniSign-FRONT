@@ -43,4 +43,19 @@ export class AuthenticationService {
     localStorage.removeItem('users');
   }
 
+  /**
+   * Save Jwt Token to local storage
+   */
+  public saveToken(token: string): void {
+    this.token = token;
+    localStorage.setItem('token', token);
+  }
+
+  /**
+   * Save User to local storage
+   */
+  public addUserToLocalStorage(user: User): void {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
 }
