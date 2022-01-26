@@ -10,7 +10,7 @@ import {User} from "../model/user";
 })
 export class AuthenticationService {
 
-  private host = environment.apiUrl;
+  public host = environment.apiUrl;
   private token = '';
   private loggedInUsername = '';
   private jwtHelper = new JwtHelperService();
