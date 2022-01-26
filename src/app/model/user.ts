@@ -1,17 +1,17 @@
 export class User {
-  private id: number;
-  private userId: string;
-  private firstName: string;
-  private lastName: string;
-  private username: string;
-  private email: string;
-  private loginDateDisplay: Date;
-  private joinDate: Date;
-  private profileImageUrl: string;
-  private isActive: boolean;
-  private isNotLocked: boolean;
-  private role: string;
-  private authorities: string[];
+  public id: number;
+  public userId: string;
+  public firstName: string;
+  public lastName: string;
+  public username: string;
+  public email: string;
+  public loginDateDisplay: Date;
+  public joinDate: Date;
+  public profileImageUrl: string;
+  public isActive: boolean;
+  public isNotLocked: boolean;
+  public role: string;
+  public authorities: [];
 
 
   constructor() {

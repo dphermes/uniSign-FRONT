@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient, HttpErrorResponse, HttpEvent} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {User} from "../model/user";
+import { User } from "../model/user";
 
 @Injectable({
   providedIn: 'root'
@@ -81,5 +81,26 @@ export class UserService {
       return JSON.parse(localStorage.getItem('users') || '{}');
     }
     return [];
+  }
+
+  /**
+   * User formData to send Data to the backend
+   * @param loggedInUsername string: currently logged-in user's username
+   * @param user User: Whole user object
+   * @param profileImage File: user's profile image
+   * @return FormData: user's form data
+   */
+  public createUserFormData(loggedInUsername: string, user: User, profileImage: File): FormData {
+    const formData = new FormData();
+    formData.append('currentUsername', loggedInUsername);
+    formData.append('firstName', user.firstName);
+    formData.append('lastName', user.lastName);
+    formData.append('username', user.username);
+    formData.append('email', user.email);
+    formData.append('role', user.role);
+    formData.append('profileImage', profileImage);
+    formData.append('isActive', JSON.stringify(user.isActive));
+    formData.append('isNotLocked', JSON.stringify(user.isNotLocked));
+    return formData;
   }
 }
