@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from "../../environments/environment";
 import { HttpClient, HttpErrorResponse, HttpResponse } from "@angular/common/http";
+import { JwtHelperService } from "@auth0/angular-jwt";
 import { Observable } from "rxjs";
 import { User } from "../model/user";
 
@@ -12,6 +13,7 @@ export class AuthenticationService {
   private host = environment.apiUrl;
   private token = '';
   private loggedInUsername = '';
+  private jwtHelper = new JwtHelperService();
 
   constructor(private http: HttpClient) { }
 
@@ -30,6 +32,22 @@ export class AuthenticationService {
    */
   public register(user: User): Observable<User | HttpErrorResponse> {
     return this.http.post<User | HttpErrorResponse>(`${this.host}/user/register`, user, {observe: 'response'});
+  }
+
+  /**
+   * Checks if user is logged in
+   */
+  public isUserLoggedIn(): boolean {
+    this.loadToken();
+    if (this.token != null && this.token !== ''
+        && (this.jwtHelper.decodeToken(this.token).sub != null || '')
+        && !this.jwtHelper.isTokenExpired(this.token)) {
+        this.loggedInUsername = this.jwtHelper.decodeToken(this.token).sub;
+        return true;
+    } else {
+      this.logout();
+      return false;
+    }
   }
 
   /**
