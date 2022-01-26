@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { environment } from "../../environments/environment";
+import {Injectable} from '@angular/core';
+import {environment} from "../../environments/environment";
 import {HttpClient, HttpErrorResponse, HttpEvent} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {User} from "../model/user";
@@ -11,7 +11,8 @@ export class UserService {
 
   private host = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   /**
    * Fetch all users service (http call)
@@ -59,9 +60,26 @@ export class UserService {
 
   /**
    * Delete user service (http call)
-   * @return User: updated user or HttpErrorResponse
    */
   public deleteUser(userId: number): Observable<any | HttpErrorResponse> {
     return this.http.delete<any>(`${this.host}/user/delete/${userId}`);
+  }
+
+  /**
+   * Add users to the Local Storage
+   * @param users User[]: list of users
+   */
+  public addUsersToLocalStorage(users: User[]): void {
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  /**
+   * Get users from the Local Storage
+   */
+  public getUsersFromLocalStorage(): User[] {
+    if (localStorage.getItem('users')) {
+      return JSON.parse(localStorage.getItem('users') || '{}');
+    }
+    return [];
   }
 }
