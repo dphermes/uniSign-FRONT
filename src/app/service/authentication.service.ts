@@ -30,7 +30,7 @@ export class AuthenticationService {
    * Register http service call
    * @param user User: Whole user object
    */
-  public register(user: User): Observable<User | HttpErrorResponse> {
+  public register(user: User): Observable<HttpResponse<User | HttpErrorResponse>> {
     return this.http.post<User | HttpErrorResponse>(`${this.host}/user/register`, user, {observe: 'response'});
   }
 
