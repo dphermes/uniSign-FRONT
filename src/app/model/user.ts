@@ -5,11 +5,11 @@ export class User {
   public lastName: string;
   public username: string;
   public email: string;
-  public loginDateDisplay: Date;
+  public lastloginDateDisplay: Date;
   public joinDate: Date;
   public profileImageUrl: string;
-  public isActive: boolean;
-  public isNotLocked: boolean;
+  public active: boolean;
+  public notLocked: boolean;
   public role: string;
   public authorities: [];
 
@@ -21,11 +21,11 @@ export class User {
     this.lastName = '';
     this.username = '';
     this.email = '';
-    this.loginDateDisplay = new Date();
+    this.lastloginDateDisplay = new Date();
     this.joinDate = new Date();
     this.profileImageUrl = '';
-    this.isActive = false;
-    this.isNotLocked = false;
+    this.active = false;
+    this.notLocked = false;
     this.role = '';
     this.authorities = [];
   }
