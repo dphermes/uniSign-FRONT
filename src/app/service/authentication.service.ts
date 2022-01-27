@@ -30,8 +30,8 @@ export class AuthenticationService {
    * Register http service call
    * @param user User: Whole user object
    */
-  public register(user: User): Observable<HttpResponse<User>> {
-    return this.http.post<User>(`${this.host}/user/register`, user, {observe: 'response'});
+  public register(user: User): Observable<User> {
+    return this.http.post<User>(`${this.host}/user/register`, user);
   }
 
   /**
