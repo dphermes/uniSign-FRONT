@@ -10,16 +10,22 @@ import {UserService} from "./service/user.service";
 import {AuthGuard} from "./guard/auth.guard";
 import {NotificationModule} from "./notification.module";
 import {NotificationService} from "./service/notification.service";
+import {LoginComponent} from './login/login.component';
+import {FormsModule} from "@angular/forms";
+import {UserManagementComponent} from './user/user-management/user-management.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoginComponent,
+    UserManagementComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    NotificationModule
+    NotificationModule,
+    FormsModule
   ],
   providers: [
     AuthenticationService,
