@@ -1,3 +1,4 @@
+<!--<div class="min-h-screen bg-no-repeat bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1564296786842-4fc88fb50485?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NzJ8fGJsdWV8ZW58MHx8MHx8&auto=format&fit=crop&w=1050&q=80')">-->
 <div class="min-h-screen bg-no-repeat bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1486520299386-6d106b22014b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80')">
   <div class="flex justify-end">
     <div class="bg-white min-h-screen w-1/2 flex justify-center items-center">
@@ -17,17 +18,19 @@
             <i class="far fa-user text-gray-400"></i>
             <input class="pl-2 outline-none border-none" type="text" name="lastName" id="lastName" ngModel #lastNameInput="ngModel" placeholder="Last name" required/>
           </div>
-          <small class="text-red-500" *ngIf="lastNameInput.invalid && lastNameInput.touched">* Please, enter a username</small>
+          <small class="text-red-500" *ngIf="lastNameInput.invalid && lastNameInput.touched">* Please, enter your last name</small>
           <div class="flex items-center border-2 py-2 px-3 rounded-2xl mt-3">
             <i class="far fa-user text-gray-400"></i>
             <input class="pl-2 outline-none border-none" type="text" name="username" id="username" ngModel #usernameInput="ngModel" placeholder="Username" required/>
           </div>
           <small class="text-red-500" *ngIf="usernameInput.invalid && usernameInput.touched">* Please, enter a username</small>
+          <small class="text-red-500" *ngIf="usernameExists">* This username already exists</small>
           <div class="flex items-center border-2 py-2 px-3 rounded-2xl mt-3">
             <i class="fas fa-at text-gray-400"></i>
             <input class="pl-2 outline-none border-none" type="email" name="email" id="email" ngModel #emailInput="ngModel" placeholder="Email" required/>
           </div>
           <small class="text-red-500" *ngIf="emailInput.invalid && emailInput.touched">* Please, enter your email</small>
+          <small class="text-red-500" *ngIf="emailExists">* This email already exists</small>
 
           <div class="">
             <button type="submit" [disabled]="registerForm.invalid || showLoading" class="mt-4 mb-3 w-full bg-blue-500 hover:bg-blue-400 disabled:bg-blue-400 text-white py-2 rounded-md transition duration-100">

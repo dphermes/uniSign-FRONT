@@ -15,6 +15,8 @@ import {NotificationType} from "../enum/notification-type.enum";
 export class RegisterComponent implements OnInit, OnDestroy {
 
   showLoading = false;
+  emailExists = false;
+  usernameExists = false;
   private subscriptions: Subscription[] = [];
 
   constructor(private router: Router,
@@ -28,6 +30,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   onRegister(user: User) {
+    this.emailExists = false;
+    this.usernameExists = false;
     this.showLoading = true;
     console.log(user);
     this.subscriptions.push(
@@ -40,6 +44,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
         (error: HttpErrorResponse) => {
           console.log(error);
           this.sendNotification(NotificationType.ERROR, error.error.message);
+          if (error.error.message == 'This username already exists') {
+            this.usernameExists = true;
+          }
+          if (error.error.message == 'This email already exists') {
+            this.emailExists = true;
+          }
           this.showLoading = false;
         }
       )
