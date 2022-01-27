@@ -19,15 +19,15 @@ export class AuthGuard implements CanActivate {
     /* For now returns a simple boolean, but if we want to check from the backend
     if a user is logged in or not (e.g: if we don't want to store the token in the localstorage)
      Then we would have to return an Observable<boolean> */
-    return true;
+    return this.isUserLoggedIn();
   }
 
   private isUserLoggedIn(): boolean {
     if (this.authService.isUserLoggedIn()) {
       return true;
     } else {
-      this.router.navigate(['/login']);
-      this.notificationService.notify(NotificationType.ERROR, "You need to log in to access this page".toUpperCase());
+      this.router.navigateByUrl('/login');
+      this.notificationService.notify(NotificationType.ERROR, "You need to log in to access this page");
       return false;
     }
   }
