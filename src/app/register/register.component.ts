@@ -33,7 +33,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.emailExists = false;
     this.usernameExists = false;
     this.showLoading = true;
-    console.log(user);
     this.subscriptions.push(
       this.authService.register(user).subscribe(
         (response: User) => {
@@ -42,7 +41,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
           this.sendNotification(NotificationType.SUCCESS, `Welcome ${response.firstName}! Check your emails for password.`);
         },
         (error: HttpErrorResponse) => {
-          console.log(error);
           this.sendNotification(NotificationType.ERROR, error.error.message);
           if (error.error.message == 'This username already exists') {
             this.usernameExists = true;
