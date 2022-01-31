@@ -5,7 +5,7 @@ export class User {
   public lastName: string;
   public username: string;
   public email: string;
-  public lastloginDateDisplay: Date;
+  public lastLoginDateDisplay: Date;
   public joinDate: Date;
   public profileImageUrl: string;
   public active: boolean;
@@ -21,7 +21,7 @@ export class User {
     this.lastName = '';
     this.username = '';
     this.email = '';
-    this.lastloginDateDisplay = new Date();
+    this.lastLoginDateDisplay = new Date();
     this.joinDate = new Date();
     this.profileImageUrl = '';
     this.active = false;

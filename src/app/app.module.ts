@@ -14,13 +14,15 @@ import {LoginComponent} from './login/login.component';
 import {FormsModule} from "@angular/forms";
 import {UserManagementComponent} from './user/user-management/user-management.component';
 import { RegisterComponent } from './register/register.component';
+import { UserAddComponent } from './user/user-add/user-add.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     UserManagementComponent,
-    RegisterComponent
+    RegisterComponent,
+    UserAddComponent
   ],
   imports: [
     BrowserModule,

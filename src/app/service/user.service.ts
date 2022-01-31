@@ -27,7 +27,7 @@ export class UserService {
    * Add a user service (http call)
    * @return User: added user or HttpErrorResponse
    */
-  public addUser(formData: FormData): Observable<User | HttpErrorResponse> {
+  public addUser(formData: FormData): Observable<User> {
     return this.http.post<User>(`${this.host}/user/add`, formData);
   }
 
@@ -35,7 +35,7 @@ export class UserService {
    * Update a user service (http call)
    * @return User: updated user or HttpErrorResponse
    */
-  public updateUser(formData: FormData): Observable<User | HttpErrorResponse> {
+  public updateUser(formData: FormData): Observable<User> {
     return this.http.post<User>(`${this.host}/user/update`, formData);
   }
 
@@ -83,6 +83,14 @@ export class UserService {
     }
     return [];
   }
+  /**
+   * Remove users from the Local Storage
+   */
+  public removeUsersFromLocalStorage(): void {
+    if (localStorage.getItem('users')) {
+      localStorage.removeItem('users');
+    }
+  }
 
   /**
    * User formData to send Data to the backend
@@ -91,7 +99,7 @@ export class UserService {
    * @param profileImage File: user's profile image
    * @return FormData: user's form data
    */
-  public createUserFormData(loggedInUsername: string, user: User, profileImage: File): FormData {
+  public createUserFormData(loggedInUsername: string = '', user: User, profileImage: File): FormData {
     const formData = new FormData();
     formData.append('currentUsername', loggedInUsername);
     formData.append('firstName', user.firstName);
