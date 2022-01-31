@@ -52,6 +52,24 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     );
   }
 
+  public searchUsers(searchTerm: string): void {
+    console.log(searchTerm);
+    const results: User[] = [];
+    for (const user of this.userService.getUsersFromLocalStorage()) {
+      // Put everything to lowercase because indexOf is case sensitive
+      if (user.firstName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+          user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+          user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+          user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
+        results.push(user);
+      }
+    }
+    this.users = results;
+    if (results.length === 0 || !searchTerm) {
+      this.users = this.userService.getUsersFromLocalStorage();
+    }
+  }
+
   public activateDeactivateUser(userToUnlock: User) {
     const formData = this.userService.createUserFormData(userToUnlock.username, userToUnlock, this.profilePicture);
     console.log(formData);
