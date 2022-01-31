@@ -1,6 +1,6 @@
 <section class="p-4">
   <div class="w-full bg-white rounded-xl flex flex-row-reverse p-2 mb-4 gap-4">
-    <button class="bg-cyan-900 text-white rounded px-4 py-2">
+    <button (click)="getUsers(true)" class="bg-cyan-900 text-white rounded px-4 py-2">
       <i class="fas fa-sync-alt" *ngIf="!showLoading"></i>
       <i class="fas fa-sync-alt fa-spin" *ngIf="showLoading"></i>
     </button>
@@ -19,17 +19,17 @@
   <div class="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <div *ngFor="let user of users" class="bg-[#20354b] rounded-2xl px-8 py-6 shadow-lg">
       <div class="relative flex items-center justify-between">
-        <span class="text-gray-400 text-sm">{{user.lastLoginDateDisplay ? (user.lastLoginDateDisplay | date: 'dd/MM/yyyy hh:mm') : 'Never signed in'}}</span>
+        <span class="text-gray-400 text-sm">{{user?.lastLoginDateDisplay ? (user?.lastLoginDateDisplay | date: 'dd/MM/yyyy hh:mm') : 'Never signed in'}}</span>
         <span class="text-emerald-400 cursor-pointer" (click)="onSelectUserDropdown(user)">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
           </svg>
         </span>
 
-        <div id="dropdownOverlay{{user.id}}" (click)="closeDropdownOverlay(user)"
+        <div id="dropdownOverlay{{user?.id}}" (click)="closeDropdownOverlay(user)"
              class="fixed inset-0 h-full w-full z-10" style="display: none"></div>
 
-        <div id="userDropDown{{user.id}}"
+        <div id="userDropDown{{user?.id}}"
              class="absolute right-0 top-0 mt-2 w-48 h-48 bg-white rounded-md overflow-hidden shadow-xl z-10" style="display: none">
           <a href="#"
              class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white">Profile</a>
@@ -40,19 +40,19 @@
       </div>
       <div class="mt-6 w-fit mx-auto">
         <div class="rounded-full overflow-hidden border-2 w-28 h-28">
-          <img src="{{user.profileImageUrl}}" class="w-full" alt="{{user.username}} profile picture" srcset="">
+          <img src="{{user?.profileImageUrl}}" class="w-full" alt="{{user?.username}} profile picture" srcset="">
         </div>
       </div>
 
       <div class="mt-8 ">
-        <h2 class="text-white font-bold text-2xl tracking-wide">{{user.firstName}}<br/> {{user.lastName}}</h2>
+        <h2 class="text-white font-bold text-2xl tracking-wide">{{user?.firstName}}<br/> {{user?.lastName}}</h2>
       </div>
       <div class="flex justify-between">
-        <p (click)="activateDeactivateUser(user)" class="{{user.active ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
-          {{user.active ? 'Active' : 'Inactive'}}
+        <p (click)="activateDeactivateUser(user)" class="{{user?.active ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
+          {{user?.active ? 'Active' : 'Inactive'}}
         </p>
-        <p (click)="lockUnlockUser(user)" class="{{user.notLocked ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
-          {{user.notLocked ? 'Not Locked' : 'Locked'}}
+        <p (click)="lockUnlockUser(user)" class="{{user?.notLocked ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
+          {{user?.notLocked ? 'Not Locked' : 'Locked'}}
         </p>
       </div>
 
@@ -61,7 +61,7 @@
       </div>
       <div class="mt-3 text-white text-sm">
         <span class="font-semibold">User Id : </span>
-        <span class="text-gray-400">{{user.userId}}</span>
+        <span class="text-gray-400">{{user?.userId}}</span>
       </div>
 
       <!-- Add User Modal -->

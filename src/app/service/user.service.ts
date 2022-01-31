@@ -99,7 +99,7 @@ export class UserService {
    * @param profileImage File: user's profile image
    * @return FormData: user's form data
    */
-  public createUserFormData(loggedInUsername: string = '', user: User, profileImage: File): FormData {
+  public createUserFormData(loggedInUsername: string, user: User, profileImage: File): FormData {
     const formData = new FormData();
     formData.append('currentUsername', loggedInUsername);
     formData.append('firstName', user.firstName);

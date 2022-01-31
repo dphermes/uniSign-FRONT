@@ -16,7 +16,7 @@ import {NgForm} from "@angular/forms";
 })
 export class UserManagementComponent implements OnInit, OnDestroy {
 
-  users: User[] = [];
+  public users: User[] = [];
   showLoading = false;
   private subscriptions: Subscription[] = [];
   private selectedUser = new User();
@@ -28,14 +28,15 @@ export class UserManagementComponent implements OnInit, OnDestroy {
               private notificationService: NotificationService) { }
 
   ngOnInit(): void {
-    this.showLoading = true;
     this.getUsers(false);
   }
 
   public getUsers(showNotification: boolean) {
+    this.showLoading = true;
     this.subscriptions.push(
       this.userService.getUsers().subscribe(
         (response: User[]) => {
+          console.log(response);
           this.userService.addUsersToLocalStorage(response);
           this.users = response;
           this.showLoading = false;
@@ -52,46 +53,46 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   public activateDeactivateUser(userToUnlock: User) {
-    const formData = this.createUpdateFormData(userToUnlock);
-    formData.append('isNotLocked', userToUnlock.notLocked.toString());
+    const formData = this.userService.createUserFormData(userToUnlock.username, userToUnlock, this.profilePicture);
+    console.log(formData);
     if (userToUnlock.active) {
-      userToUnlock.active = false;
-      formData.append('isActive', 'false');
+      formData.set('set', 'false');
     } else {
-      userToUnlock.active = true;
-      formData.append('isActive', 'true');
+      formData.set('set', 'true');
     }
-    this.userService.updateUser(formData).subscribe(
-      (response: User) => {
-        this.authService.getUserFromLocalStorage();
-        this.sendNotification(NotificationType.SUCCESS, `${response.firstName} is active`);
-      },
-      (error: HttpErrorResponse) => {
-        this.sendNotification(NotificationType.ERROR, error.error.message);
-        this.showLoading = false;
-      }
-    );
+    this.subscriptions.push(
+      this.userService.updateUser(formData).subscribe(
+        (response: User) => {
+          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully!`);
+          this.getUsers(false);
+        },
+        (error: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, error.error.message);
+          this.showLoading = false;
+        }
+      )
+    )
   }
 
   public lockUnlockUser(userToUnlock: User) {
-    const formData = this.createUpdateFormData(userToUnlock);
-    formData.append('isActive', userToUnlock.active.toString());
+    const formData = this.userService.createUserFormData(userToUnlock.username, userToUnlock, this.profilePicture);
     if (userToUnlock.notLocked) {
-      userToUnlock.notLocked = false;
-      formData.append('isNotLocked', 'false');
+      formData.set('isNotLocked', 'false');
     } else {
-      userToUnlock.notLocked = true;
-      formData.append('isNotLocked', 'true');
+      formData.set('isNotLocked', 'true');
     }
-    this.userService.updateUser(formData).subscribe(
-      (response: User) => {
-        this.sendNotification(NotificationType.SUCCESS, `${response.firstName} is unlocked`);
-      },
-      (error: HttpErrorResponse) => {
-        this.sendNotification(NotificationType.ERROR, error.error.message);
-        this.showLoading = false;
-      }
-    );
+    this.subscriptions.push(
+      this.userService.updateUser(formData).subscribe(
+        (response: User) => {
+          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully!`);
+          this.getUsers(false);
+        },
+        (error: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, error.error.message);
+          this.showLoading = false;
+        }
+      )
+    )
   }
 
   private createUpdateFormData(user: User): FormData {
@@ -106,7 +107,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   onAddNewUser(userForm: NgForm): void {
-    const formData = this.userService.createUserFormData('', userForm.value, this.profilePicture);
+    // @ts-ignore
+    const formData = this.userService.createUserFormData(null, userForm.value, this.profilePicture);
     this.subscriptions.push(
       this.userService.addUser(formData).subscribe(
         (response: User) => {
@@ -115,6 +117,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           userForm.reset();
           this.cancelAddUser();
           this.sendNotification(NotificationType.SUCCESS, `${response.firstName} added successfully`);
+          this.getUsers(false);
         },
         (error: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, error.error.message);
