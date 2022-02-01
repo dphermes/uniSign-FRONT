@@ -20,8 +20,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public users: User[] = [];
   showLoading = false;
   private subscriptions: Subscription[] = [];
-  private selectedUser = new User();
   profilePicture!: File;
+  private openedModals: string[] = [];
 
   constructor(private router: Router,
               private userService: UserService,
@@ -32,6 +32,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.getUsers(false);
   }
 
+  /**
+   * Fetch the whole list of users
+   * @param showNotification boolean: if you want to show a notification with the amount of retrieved user
+   */
   public getUsers(showNotification: boolean) {
     this.showLoading = true;
     this.subscriptions.push(
@@ -53,6 +57,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Search users by fist name, last name, username, email or userId in the list of users
+   * @param searchTerm string: fist name, last name, username, email or userId to search
+   */
   public searchUsers(searchTerm: string): void {
     console.log(searchTerm);
     const results: User[] = [];
@@ -125,6 +133,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     return formData;
   }
 
+  /**
+   * Add a new user to the database
+   * @param userForm: Form with new user's information
+   */
   onAddNewUser(userForm: NgForm): void {
     // @ts-ignore
     const formData = this.userService.createUserFormData(null, userForm.value, this.profilePicture);
@@ -134,7 +146,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           // @ts-ignore
           this.profilePicture = null;
           userForm.reset();
-          this.cancelAddUser();
+          this.onCloseModals();
           this.sendNotification(NotificationType.SUCCESS, `${response.firstName} added successfully`);
           this.getUsers(false);
         },
@@ -145,12 +157,16 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Delete a user from the database
+   * @param userToDelete User: User to delete
+   */
   onDeleteUser(userToDelete: User): void {
     this.showLoading = true;
     this.subscriptions.push(
       this.userService.deleteUser(userToDelete.id).subscribe(
         (response: CustomHttpResponse) => {
-          this.onCancelDelete(userToDelete.userId);
+          this.onCloseModals();
           this.sendNotification(NotificationType.SUCCESS, response.message);
           this.showLoading = false;
           this.getUsers(false);
@@ -163,6 +179,11 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Reset a user's password and send email with new password
+   * @param emailAddress string: user's email address to send email
+   * @param userId string: userId to close reset password modal
+   */
   onResetPassword(emailAddress: string, userId: string): void {
     this.showLoading = true;
     const loggedInUser = this.authService.getUserFromLocalStorage();
@@ -171,10 +192,11 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.userService.resetPassword(emailAddress).subscribe(
         (response: CustomHttpResponse) => {
           this.sendNotification(NotificationType.SUCCESS, response.message);
-          this.onCancelResetPassword(userId);
+          this.onCloseModals();
           this.showLoading = false;
           if (loggedInUserEmail == emailAddress) {
             this.authService.logout();
+            this.router.navigateByUrl('login');
           } else {
             this.getUsers(false);
           }
@@ -187,6 +209,46 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     );
   }
 
+  onProfileImageChange(event: any): void {
+    const output = document.getElementById('profilePicturePreview');
+    this.profilePicture = event.target.files[0];
+    // @ts-ignore
+    output.src = URL.createObjectURL(this.profilePicture);
+  }
+
+  /**
+   * Opens a modal in template and stores it in an array to close later
+   * @param modalName string: name of the modal we want to open
+   */
+  onOpenModal(modalName: string): void {
+    this.onCloseModals();
+    this.openedModals.push(modalName);
+    if (modalName.includes('userDropDown')) {
+      // @ts-ignore
+      document.getElementById('modalOverlay').style.display='block';
+      this.openedModals.push('modalOverlay');
+    }
+    // @ts-ignore
+    document.getElementById(modalName).style.display='block';
+  }
+
+  /**
+   * Closes all modals opened and stored in openedModals array
+   */
+  onCloseModals(): void {
+    for (let modal of this.openedModals) {
+      // @ts-ignore
+      document.getElementById(modal).style.display='none';
+    }
+    this.openedModals = [];
+  }
+
+  /**
+   * Calls Notification Service to notify in this component
+   * @param notificationType NotificationType: notification type (e.g: ERROR, SUCCESS...)
+   * @param message string: Message to show in the notification
+   * @private
+   */
   private sendNotification(notificationType: NotificationType, message: string): void {
     if (message) {
       this.notificationService.notify(notificationType, message);
@@ -195,65 +257,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onSelectUserDropdown(userId: string): void {
-    // @ts-ignore
-    document.getElementById('userDropDown' + userId).style.display='block';
-    // @ts-ignore
-    document.getElementById('dropdownOverlay' + userId).style.display='block';
-  }
-
-  public closeDropdownOverlay(userId: string) {
-    // @ts-ignore
-    document.getElementById('userDropDown' + userId).style.display='none';
-    // @ts-ignore
-    document.getElementById('dropdownOverlay' + userId).style.display='none';
-  }
-
-  openUserDeleteModal(userId: string): void {
-    // @ts-ignore
-    document.getElementById('userDropDown' + userId).style.display='none';
-    // @ts-ignore
-    document.getElementById('dropdownOverlay' + userId).style.display='none';
-    // @ts-ignore
-    document.getElementById('userDeleteModal' + userId).style.display='block';
-  }
-
-  onCancelDelete(userId: string): void {
-    // @ts-ignore
-    document.getElementById('userDeleteModal' + userId).style.display='none';
-  }
-
-  onOpenAddUserModal() {
-    // @ts-ignore
-    document.getElementById('userAddModal').style.display='block';
-  }
-
-  cancelAddUser(): void {
-    // @ts-ignore
-    document.getElementById('userAddModal').style.display='none';
-  }
-
-  onOpenResetPasswordModal(userId: string): void {
-    // @ts-ignore
-    document.getElementById('userDropDown' + userId).style.display='none';
-    // @ts-ignore
-    document.getElementById('userResetPasswordModal' + userId).style.display='block';
-  }
-
-  onCancelResetPassword(userId: string):void {
-    // @ts-ignore
-    document.getElementById('userResetPasswordModal' + userId).style.display='none';
-  }
-
-  onProfileImageChange(event: any): void {
-    const output = document.getElementById('profilePicturePreview');
-    this.profilePicture = event.target.files[0];
-    // @ts-ignore
-    output.src = URL.createObjectURL(this.profilePicture);
-  }
-
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
-
 }
