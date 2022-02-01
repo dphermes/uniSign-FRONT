@@ -1,6 +1,6 @@
 <section class="relative block h-72">
   <div class="absolute top-0 w-full h-full bg-center bg-cover" style="
-            background-image: url('https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=2710&amp;q=80');
+            background-image: url('https://images.unsplash.com/photo-1486520299386-6d106b22014b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80');
           ">
     <span id="blackOverlay" class="w-full h-full absolute opacity-50 bg-black"></span>
   </div>
@@ -11,14 +11,23 @@
       <div class="px-6">
         <div class="flex flex-wrap justify-center">
           <div class="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
-            <div class="relative h-40 w-40 z-10">
-              <img alt="..." src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg" class="shadow-xl rounded-full w-full align-middle border-none absolute -mt-20">
+            <div class="absolute -mt-20 h-40 w-40 rounded-full overflow-hidden border-2 border-gray-400 bg-[#20354b]">
+              <img id="profilePicturePreview" src="{{user.profileImageUrl}}" alt="..." class="w-full align-middle0">
             </div>
+            <div (click)="updateProfilePicture()" class="absolute h-8 w-8 mt-10 ml-28 mx-auto text-center rounded-full overflow-hidden bg-[#20354b] hover:bg-green-600 border-2 border-gray-400 cursor-pointer">
+              <i class="fas fa-pencil-alt text-white align-middle"></i>
+            </div>
+            <!-- Hidden Form to change Profile Picture -->
+            <form enctype="multipart/form-data" class="hidden">
+              <input type="file"
+              (change)="onProfileImageChange($event); onUpdateProfileImage()"
+              name="profile-picture-input" id="profile-picture-input" placeholder="file" accept="*">
+            </form>
           </div>
           <div class="w-full lg:w-4/12 px-4 lg:order-3 lg:text-right lg:self-center">
             <div class="py-6 px-3 mt-32 sm:mt-0">
-              <button class="bg-pink-500 active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150" type="button">
-                Connect
+              <button (click)="onLogout()" class="bg-red-700 hover:bg-red-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150" type="button">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
               </button>
             </div>
           </div>
@@ -37,18 +46,24 @@
           </div>
         </div>
         <div class="text-center">
-          <h3 class="text-4xl font-semibold leading-normal mb-2 text-blueGray-700 mb-2">
-            Jenna Stones
+          <h3 class="text-4xl font-semibold leading-normal mb-2 text-blueGray-700 mb-0">
+            {{user.firstName}} {{user.lastName}}
           </h3>
-          <div class="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold uppercase">
-            <i class="fas fa-map-marker-alt mr-2 text-lg text-blueGray-400"></i>
-            Los Angeles, California
+          <div class="mb-2 text-blueGray-600">
+            <i class="fas fa-user text-cyan-500"></i> {{user.username}} | <i class="fab fa-slack-hash text-cyan-500"></i> {{user.userId}}
           </div>
-          <div class="mb-2 text-blueGray-600 mt-10">
-            <i class="fas fa-briefcase mr-2 text-lg text-blueGray-400"></i>Solution Manager - Creative Tim Officer
+          <div class="text-sm leading-normal mt-10 mb-2 text-slate-400 font-bold uppercase">
+            <i class="fas fa-map-marker-alt mr-2 text-lg"></i>
+            KMCL, St Sébastien sur Loire
           </div>
           <div class="mb-2 text-blueGray-600">
-            <i class="fas fa-university mr-2 text-lg text-blueGray-400"></i>University of Computer Science
+            <i class="fas fa-briefcase mr-2 text-cyan-500"></i> Concepteur développeur
+          </div>
+          <div class="mb-2 text-blueGray-600">
+            <i class="fas fa-at mr-2 text-cyan-500"></i> {{user.email}}
+          </div>
+          <div class="mb-2 text-blueGray-600">
+            <i class="fas fa-key mr-2 text-cyan-500"></i> {{user.role}}
           </div>
         </div>
         <div class="mt-10 py-10 border-t border-blueGray-200 text-center">

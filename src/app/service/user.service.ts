@@ -55,7 +55,7 @@ export class UserService {
    * Update user's Profile Image service (http call)
    * @return User: updated user or HttpErrorResponse
    */
-  public updateProfileImage(formData: FormData): Observable<HttpEvent<User> | HttpErrorResponse> {
+  public updateProfileImage(formData: FormData): Observable<HttpEvent<User>> {
     return this.http.post<User>(`${this.host}/user/update-profile-image`, formData,
       {
         reportProgress: true,
