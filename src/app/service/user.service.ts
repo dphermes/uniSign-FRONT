@@ -19,7 +19,7 @@ export class UserService {
    * Fetch all users service (http call)
    * @return User[]: list of all users or HttpErrorResponse
    */
-  public getUsers(): Observable<User[] | HttpErrorResponse> {
+  public getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.host}/user/all`);
   }
 
@@ -27,7 +27,7 @@ export class UserService {
    * Add a user service (http call)
    * @return User: added user or HttpErrorResponse
    */
-  public addUser(formData: FormData): Observable<User | HttpErrorResponse> {
+  public addUser(formData: FormData): Observable<User> {
     return this.http.post<User>(`${this.host}/user/add`, formData);
   }
 
@@ -35,7 +35,7 @@ export class UserService {
    * Update a user service (http call)
    * @return User: updated user or HttpErrorResponse
    */
-  public updateUser(formData: FormData): Observable<User | HttpErrorResponse> {
+  public updateUser(formData: FormData): Observable<User> {
     return this.http.post<User>(`${this.host}/user/update`, formData);
   }
 
@@ -43,7 +43,7 @@ export class UserService {
    * Reset user's password service (http call)
    * @return User: updated user or HttpErrorResponse
    */
-  public resetPassword(email: string): Observable<CustomHttpResponse | HttpErrorResponse> {
+  public resetPassword(email: string): Observable<CustomHttpResponse> {
     return this.http.get<CustomHttpResponse>(`${this.host}/user/reset-password/${email}`);
   }
 
@@ -62,7 +62,7 @@ export class UserService {
   /**
    * Delete user service (http call)
    */
-  public deleteUser(userId: number): Observable<CustomHttpResponse | HttpErrorResponse> {
+  public deleteUser(userId: number): Observable<CustomHttpResponse> {
     return this.http.delete<CustomHttpResponse>(`${this.host}/user/delete/${userId}`);
   }
 
@@ -83,6 +83,14 @@ export class UserService {
     }
     return [];
   }
+  /**
+   * Remove users from the Local Storage
+   */
+  public removeUsersFromLocalStorage(): void {
+    if (localStorage.getItem('users')) {
+      localStorage.removeItem('users');
+    }
+  }
 
   /**
    * User formData to send Data to the backend
@@ -100,8 +108,8 @@ export class UserService {
     formData.append('email', user.email);
     formData.append('role', user.role);
     formData.append('profileImage', profileImage);
-    formData.append('isActive', JSON.stringify(user.isActive));
-    formData.append('isNotLocked', JSON.stringify(user.isNotLocked));
+    formData.append('isActive', JSON.stringify(user.active));
+    formData.append('isNotLocked', JSON.stringify(user.notLocked));
     return formData;
   }
 }
