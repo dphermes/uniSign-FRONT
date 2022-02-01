@@ -62,7 +62,7 @@ export class UserService {
   /**
    * Delete user service (http call)
    */
-  public deleteUser(userId: number): Observable<CustomHttpResponse | HttpErrorResponse> {
+  public deleteUser(userId: number): Observable<CustomHttpResponse> {
     return this.http.delete<CustomHttpResponse>(`${this.host}/user/delete/${userId}`);
   }
 

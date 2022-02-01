@@ -247,11 +247,11 @@
               <p class="text-red-500 font-semibold">This action is irreversible</p>
             </main>
             <footer class="flex justify-center bg-transparent mt-6">
-              <button (click)="cancelDelete(user)"
+              <button (click)="onCancelDelete(user)"
                 class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
                 Cancel
               </button>
-              <button (click)="deleteUser(user)"
+              <button (click)="onDeleteUser(user)"
                 class="bg-red-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
                 Confirm
               </button>

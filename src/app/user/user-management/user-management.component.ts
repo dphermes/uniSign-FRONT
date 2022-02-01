@@ -8,6 +8,7 @@ import {NotificationService} from "../../service/notification.service";
 import {NotificationType} from "../../enum/notification-type.enum";
 import {HttpErrorResponse} from "@angular/common/http";
 import {NgForm} from "@angular/forms";
+import {CustomHttpResponse} from "../../model/custom-http-response";
 
 @Component({
   selector: 'app-user-management',
@@ -144,11 +145,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     )
   }
 
-  deleteUser(userToDelete: User) {
+  onDeleteUser(userToDelete: User) {
     this.subscriptions.push(
       this.userService.deleteUser(userToDelete.id).subscribe(
-        (response) => {
-          this.sendNotification(NotificationType.SUCCESS, `${response.message}`);
+        (response: CustomHttpResponse) => {
+          this.onCancelDelete(userToDelete);
+          this.sendNotification(NotificationType.SUCCESS, response.message);
+          this.getUsers(false);
         },
         (error: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, error.error.message);
@@ -190,7 +193,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     document.getElementById('userDeleteModal' + selectedUser.id).style.display='block';
   }
 
-  cancelDelete(selectedUser: User) {
+  onCancelDelete(selectedUser: User) {
     // @ts-ignore
     document.getElementById('userDeleteModal' + selectedUser.id).style.display='none';
   }
