@@ -90,7 +90,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           this.showLoading = false;
         }
       )
-    )
+    );
   }
 
   public lockUnlockUser(userToUnlock: User) {
@@ -111,7 +111,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           this.showLoading = false;
         }
       )
-    )
+    );
   }
 
   private createUpdateFormData(user: User): FormData {
@@ -142,22 +142,49 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           this.sendNotification(NotificationType.ERROR, error.error.message);
         }
       )
-    )
+    );
   }
 
-  onDeleteUser(userToDelete: User) {
+  onDeleteUser(userToDelete: User): void {
+    this.showLoading = true;
     this.subscriptions.push(
       this.userService.deleteUser(userToDelete.id).subscribe(
         (response: CustomHttpResponse) => {
-          this.onCancelDelete(userToDelete);
+          this.onCancelDelete(userToDelete.userId);
           this.sendNotification(NotificationType.SUCCESS, response.message);
+          this.showLoading = false;
           this.getUsers(false);
         },
         (error: HttpErrorResponse) => {
+          this.showLoading = false;
           this.sendNotification(NotificationType.ERROR, error.error.message);
         }
       )
-    )
+    );
+  }
+
+  onResetPassword(emailAddress: string, userId: string): void {
+    this.showLoading = true;
+    const loggedInUser = this.authService.getUserFromLocalStorage();
+    const loggedInUserEmail = loggedInUser.email;
+    this.subscriptions.push(
+      this.userService.resetPassword(emailAddress).subscribe(
+        (response: CustomHttpResponse) => {
+          this.sendNotification(NotificationType.SUCCESS, response.message);
+          this.onCancelResetPassword(userId);
+          this.showLoading = false;
+          if (loggedInUserEmail == emailAddress) {
+            this.authService.logout();
+          } else {
+            this.getUsers(false);
+          }
+        },
+        (error: HttpErrorResponse) => {
+          this.showLoading = false;
+          this.sendNotification(NotificationType.WARNING, error.error.message);
+        }
+      )
+    );
   }
 
   private sendNotification(notificationType: NotificationType, message: string): void {
@@ -168,34 +195,32 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onSelectUserDropdown(selectedUser: User): void {
-    this.selectedUser = selectedUser;
+  public onSelectUserDropdown(userId: string): void {
     // @ts-ignore
-    document.getElementById('userDropDown' + selectedUser.id).style.display='block';
+    document.getElementById('userDropDown' + userId).style.display='block';
     // @ts-ignore
-    document.getElementById('dropdownOverlay' + selectedUser.id).style.display='block';
+    document.getElementById('dropdownOverlay' + userId).style.display='block';
   }
 
-  public closeDropdownOverlay(selectedUser: User) {
+  public closeDropdownOverlay(userId: string) {
     // @ts-ignore
-    document.getElementById('userDropDown' + selectedUser.id).style.display='none';
+    document.getElementById('userDropDown' + userId).style.display='none';
     // @ts-ignore
-    document.getElementById('dropdownOverlay' + selectedUser.id).style.display='none';
+    document.getElementById('dropdownOverlay' + userId).style.display='none';
   }
 
-  openUserDeleteModal(selectedUser: User): void {
-    this.selectedUser = selectedUser;
+  openUserDeleteModal(userId: string): void {
     // @ts-ignore
-    document.getElementById('userDropDown' + selectedUser.id).style.display='none';
+    document.getElementById('userDropDown' + userId).style.display='none';
     // @ts-ignore
-    document.getElementById('dropdownOverlay' + selectedUser.id).style.display='none';
+    document.getElementById('dropdownOverlay' + userId).style.display='none';
     // @ts-ignore
-    document.getElementById('userDeleteModal' + selectedUser.id).style.display='block';
+    document.getElementById('userDeleteModal' + userId).style.display='block';
   }
 
-  onCancelDelete(selectedUser: User) {
+  onCancelDelete(userId: string): void {
     // @ts-ignore
-    document.getElementById('userDeleteModal' + selectedUser.id).style.display='none';
+    document.getElementById('userDeleteModal' + userId).style.display='none';
   }
 
   onOpenAddUserModal() {
@@ -206,6 +231,18 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   cancelAddUser(): void {
     // @ts-ignore
     document.getElementById('userAddModal').style.display='none';
+  }
+
+  onOpenResetPasswordModal(userId: string): void {
+    // @ts-ignore
+    document.getElementById('userDropDown' + userId).style.display='none';
+    // @ts-ignore
+    document.getElementById('userResetPasswordModal' + userId).style.display='block';
+  }
+
+  onCancelResetPassword(userId: string):void {
+    // @ts-ignore
+    document.getElementById('userResetPasswordModal' + userId).style.display='none';
   }
 
   onProfileImageChange(event: any): void {

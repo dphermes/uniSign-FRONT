@@ -43,7 +43,7 @@ export class UserService {
    * Reset user's password service (http call)
    * @return User: updated user or HttpErrorResponse
    */
-  public resetPassword(email: string): Observable<CustomHttpResponse | HttpErrorResponse> {
+  public resetPassword(email: string): Observable<CustomHttpResponse> {
     return this.http.get<CustomHttpResponse>(`${this.host}/user/reset-password/${email}`);
   }
 
