@@ -28,6 +28,10 @@ export class UserService {
    * @return User: added user or HttpErrorResponse
    */
   public addUser(formData: FormData): Observable<User> {
+    // console.log('FORMDATA in USER SERVICE');
+    // for (var pair of formData.entries()) {
+    //     console.log(pair[0]+ ', ' + pair[1]);
+    //   }
     return this.http.post<User>(`${this.host}/user/add`, formData);
   }
 
@@ -109,7 +113,7 @@ export class UserService {
     formData.append('role', user.role);
     formData.append('profileImage', profileImage);
     formData.append('isActive', JSON.stringify(user.active));
-    formData.append('isNotLocked', JSON.stringify(user.notLocked));
+    formData.append('isNonLocked', JSON.stringify(user.notLocked));
     return formData;
   }
 }

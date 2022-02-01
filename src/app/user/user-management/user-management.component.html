@@ -47,11 +47,11 @@
         <h2 class="text-white font-bold text-2xl tracking-wide">{{user?.firstName}}<br/> {{user?.lastName}}</h2>
       </div>
       <div class="flex justify-between">
-        <p (click)="activateDeactivateUser(user)" class="{{user?.active ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
-          {{user?.active ? 'Active' : 'Inactive'}}
+        <p (click)="activateDeactivateUser(user)" class="{{user.active == true ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
+          {{user.active == true ? 'Active' : 'Inactive'}}
         </p>
-        <p (click)="lockUnlockUser(user)" class="{{user?.notLocked ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
-          {{user?.notLocked ? 'Not Locked' : 'Locked'}}
+        <p (click)="lockUnlockUser(user)" class="{{user.notLocked == true ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
+          {{user.notLocked == true ? 'Not Locked' : 'Locked'}}
         </p>
       </div>
 
@@ -188,6 +188,7 @@
                           id="active"
                           checked
                           checked="checked"
+                          [ngModel]="true"
                           ngModel #activeInput="ngModel"
                           class="form-checkbox h-4 w-4 text-teal-700 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Active</span>
                       </label>
@@ -199,6 +200,7 @@
                           name="notLocked"
                           id="notLocked"
                           checked
+                          [ngModel]="true"
                           ngModel #notLockedInput="ngModel"
                           class="form-checkbox h-4 w-4 text-teal-700 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Unlocked</span>
                       </label>

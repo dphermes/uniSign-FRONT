@@ -81,11 +81,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   public activateDeactivateUser(userToUnlock: User) {
     const formData = this.userService.createUserFormData(userToUnlock.username, userToUnlock, this.profilePicture);
-    console.log(formData);
     if (userToUnlock.active) {
-      formData.set('set', 'false');
+      formData.set('isActive', 'false');
     } else {
-      formData.set('set', 'true');
+      formData.set('isActive', 'true');
     }
     this.subscriptions.push(
       this.userService.updateUser(formData).subscribe(
@@ -104,9 +103,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public lockUnlockUser(userToUnlock: User) {
     const formData = this.userService.createUserFormData(userToUnlock.username, userToUnlock, this.profilePicture);
     if (userToUnlock.notLocked) {
-      formData.set('isNotLocked', 'false');
+      formData.set('isNonLocked', 'false');
     } else {
-      formData.set('isNotLocked', 'true');
+      formData.set('isNonLocked', 'true');
     }
     this.subscriptions.push(
       this.userService.updateUser(formData).subscribe(
@@ -140,6 +139,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   onAddNewUser(userForm: NgForm): void {
     // @ts-ignore
     const formData = this.userService.createUserFormData(null, userForm.value, this.profilePicture);
+    // for (var pair of formData.entries()) {
+    //   console.log(pair[0]+ ', ' + pair[1]);
+    // }
     this.subscriptions.push(
       this.userService.addUser(formData).subscribe(
         (response: User) => {

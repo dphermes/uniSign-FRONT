@@ -24,8 +24,8 @@ export class User {
     this.lastLoginDateDisplay = new Date();
     this.joinDate = new Date();
     this.profileImageUrl = '';
-    this.active = false;
-    this.notLocked = false;
+    this.active = true;
+    this.notLocked = true;
     this.role = '';
     this.authorities = [];
   }
