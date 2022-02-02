@@ -18,11 +18,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   user = new User();
   loggedInUser = new User();
+  editUser = new User();
+  private currentUsername = '';
   profilePicture!: File;
   private subscriptions: Subscription[] = [];
   public fileStatus = new FileUploadStatus();
   usernameParam = '';
   isloggedInUser = false;
+  private openedModals: string[] = [];
 
   constructor(private authService: AuthenticationService,
               private userService: UserService,
@@ -60,15 +63,16 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    * Binded click action on visible button to trigger the hidden submit button in hidden form
    */
   onUpdateProfilePicture(): void {
-    UserProfileComponent.clickButton('profile-picture-input');
+    this.clickButton('profile-picture-input');
   }
 
   /**
    * Handles the profile image change to send the new image in the front end
-   * @param event
+   * @param event HttpEvent: event triggered when uploading profile picture
+   * @param imageId string: tag's id of image preview
    */
-  onProfileImageChange(event: any): void {
-    const output = document.getElementById('profilePicturePreview');
+  onProfileImageChange(event: any, imageId: string): void {
+    const output = document.getElementById(imageId);
     this.profilePicture = event.target.files[0];
     // @ts-ignore
     output.src = URL.createObjectURL(this.profilePicture);
@@ -85,6 +89,30 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.userService.updateProfileImage(formData).subscribe(
         (event: HttpEvent<any>) => {
           this.reportUploadProgress(event);
+        },
+        (error: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, error.error.message);
+        }
+      )
+    );
+  }
+
+  onEditUser(editUser: User) {
+    this.editUser = editUser;
+    this.currentUsername = editUser.username;
+    this.clickButton('openEditModal');
+  }
+
+  updateUser(): void {
+    // @ts-ignore
+    const formData = this.userService.createUserFormData(this.currentUsername, this.editUser, this.profilePicture);
+    this.subscriptions.push(
+      this.userService.updateUser(formData).subscribe(
+        (response: User) => {
+          this.onCloseModals();
+          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully`);
+          this.router.navigateByUrl('user/profile/' + response.username);
+          // this.getUsers(false);
         },
         (error: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, error.error.message);
@@ -127,7 +155,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    * @param buttonId string: button id
    * @private
    */
-  private static clickButton(buttonId: string): void {
+  private clickButton(buttonId: string): void {
     // @ts-ignore
     document.getElementById(buttonId).click();
   }
@@ -152,6 +180,34 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     } else {
       this.notificationService.notify(notificationType, 'An error occurred. Please try again.');
     }
+  }
+
+  /**
+   * Opens a modal in template and stores it in an array to close later
+   * @param modalName string: name of the modal we want to open
+   */
+  onOpenModal(modalName: string): void {
+    this.onCloseModals();
+    this.openedModals.push(modalName);
+    if (modalName.includes('userDropDown')) {
+      // @ts-ignore
+      document.getElementById('modalOverlay').style.display='block';
+      this.openedModals.push('modalOverlay');
+    }
+    // @ts-ignore
+    document.getElementById(modalName).style.display='block';
+    console.log(this.openedModals);
+  }
+
+  /**
+   * Closes all modals opened and stored in openedModals array
+   */
+  onCloseModals(): void {
+    for (let modal of this.openedModals) {
+      // @ts-ignore
+      document.getElementById(modal).style.display='none';
+    }
+    this.openedModals = [];
   }
 
   ngOnDestroy(): void {
