@@ -4,7 +4,7 @@
       <i class="fas fa-sync-alt" *ngIf="!showLoading"></i>
       <i class="fas fa-sync-alt fa-spin" *ngIf="showLoading"></i>
     </button>
-    <button (click)="onOpenModal('userAddModal')" class="bg-pink-600 text-white rounded-full px-4 py-2">
+    <button (click)="onOpenModal('userAddModal')" class="bg-pink-600 text-white hover:bg-pink-700 rounded-full px-4 py-2">
       <i class="fas fa-plus"></i> Add User
     </button>
     <form #searchForm="ngForm" class="right-0 relative text-teal-700">
@@ -19,7 +19,7 @@
   <div class="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <div *ngFor="let user of users" class="bg-[#20354b] rounded-2xl px-8 py-6 shadow-lg">
       <div class="relative flex items-center justify-between">
-        <span class="text-gray-400 text-sm">{{user?.lastLoginDateDisplay ? (user?.lastLoginDateDisplay | date: 'dd/MM/yyyy hh:mm') : 'Never signed in'}}</span>
+        <span class="text-gray-400 text-sm">{{user?.lastLoginDateDisplay ? (user?.lastLoginDateDisplay | date: 'dd/MM/yyyy hh:mm') : 'Never logged in'}}</span>
         <span class="text-emerald-400 cursor-pointer" (click)="onOpenModal('userDropDown' + user.userId)">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
@@ -31,27 +31,41 @@
 
         <div id="userDropDown{{user?.userId}}"
              class="absolute right-0 top-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-20" style="display: none">
-          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white">Profile</a>
-          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white">Signatures</a>
-          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white" (click)="onOpenModal('userResetPasswordModal' + user.userId)">Reset password</a>
-          <a class="block px-4 py-2 text-sm text-red-500 hover:bg-[#20354b]" (click)="onOpenModal('userDeleteModal' + user.userId)">Delete User</a>
+          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white" href="user/profile/{{user?.username}}">Profile</a>
+          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white cursor-pointer" (click)="onOpenModal('userResetPasswordModal' + user.userId)">Reset password</a>
+          <a class="block px-4 py-2 text-sm text-red-500 hover:bg-[#20354b] cursor-pointer" (click)="onOpenModal('userDeleteModal' + user.userId)">Delete User</a>
         </div>
       </div>
       <div class="mt-6 w-fit mx-auto">
-        <div class="rounded-full overflow-hidden border-2 w-28 h-28">
-          <img src="{{user?.profileImageUrl}}" class="w-full" alt="{{user?.username}} profile picture" srcset="">
-        </div>
+        <a href="/user/profile/{{user.username}}">
+          <div class="cursor-pointer rounded-full overflow-hidden border-2 w-28 h-28">
+            <img src="{{user?.profileImageUrl}}" class="h-full w-full object-cover" alt="{{user?.username}} profile picture" srcset="">
+          </div>
+        </a>
       </div>
 
       <div class="mt-8 ">
         <h2 class="text-white font-bold text-2xl tracking-wide">{{user?.firstName}}<br/> {{user?.lastName}}</h2>
       </div>
       <div class="flex justify-between">
-        <p (click)="activateDeactivateUser(user)" class="{{user.active == true ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
-          {{user.active == true ? 'Active' : 'Inactive'}}
+        <form #isActiveForm="ngForm" [hidden]="true" class="hidden" (ngSubmit)="updateUser()">
+          <input type="checkbox"
+                 name="active"
+                 [(ngModel)]="user.active">
+          <button type="submit" id="isActiveSubmit{{user.userId}}"></button>
+        </form>
+        <p (click)="changeUserStatus(user, 'isActive')" class="{{user.active ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
+          {{user.active ? 'Active' : 'Inactive'}}
         </p>
-        <p (click)="lockUnlockUser(user)" class="{{user.notLocked == true ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
-          {{user.notLocked == true ? 'Not Locked' : 'Locked'}}
+
+        <form #isNotLockedForm="ngForm" [hidden]="true" class="hidden" (ngSubmit)="updateUser()">
+          <input type="checkbox"
+                 name="active"
+                 [(ngModel)]="user.notLocked">
+          <button type="submit" id="isNotLockedSubmit{{user.userId}}"></button>
+        </form>
+        <p (click)="changeUserStatus(user, 'isNotLocked')" class="{{user.notLocked ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
+          {{user.notLocked ? 'Not Locked' : 'Locked'}}
         </p>
       </div>
 
@@ -60,7 +74,9 @@
       </div>
       <div class="mt-3 text-white text-sm">
         <span class="font-semibold">User Id : </span>
-        <span class="text-gray-400">{{user?.userId}}</span>
+        <a href="/user/profile/{{user.username}}">
+          <span class="text-gray-400">{{user?.userId}}</span>
+        </a>
       </div>
 
       <!-- Add User Modal -->
@@ -209,7 +225,7 @@
                 </div>
 
                 <footer class="flex justify-center bg-transparent mt-6">
-                  <button (click)="onCloseModals()"
+                  <button (click)="onCloseModals()" type="button"
                           class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
                     Cancel
                   </button>
@@ -248,7 +264,7 @@
               <p class="text-red-500 font-semibold">This action is irreversible</p>
             </main>
             <footer class="flex justify-center bg-transparent mt-6">
-              <button (click)="onCloseModals()"
+              <button (click)="onCloseModals()" type="button"
                 class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
                 Cancel
               </button>
@@ -285,7 +301,7 @@
               <p>An email with the new password will be sent to <span class="font-semibold">{{user.email}}</span></p>
             </main>
             <footer class="flex justify-center bg-transparent mt-6">
-              <button (click)="onCloseModals()"
+              <button (click)="onCloseModals()" type="button"
                       class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
                 Cancel
               </button>
