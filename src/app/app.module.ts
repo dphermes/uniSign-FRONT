@@ -14,7 +14,6 @@ import {LoginComponent} from './login/login.component';
 import {FormsModule} from "@angular/forms";
 import {UserManagementComponent} from './user/user-management/user-management.component';
 import { RegisterComponent } from './register/register.component';
-import { UserAddComponent } from './user/user-add/user-add.component';
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
 
 @NgModule({
@@ -23,7 +22,6 @@ import { UserProfileComponent } from './user/user-profile/user-profile.component
     LoginComponent,
     UserManagementComponent,
     RegisterComponent,
-    UserAddComponent,
     UserProfileComponent
   ],
   imports: [

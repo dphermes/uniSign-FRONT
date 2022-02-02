@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
-import {HttpClient, HttpErrorResponse, HttpEvent} from "@angular/common/http";
+import {HttpClient, HttpEvent} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {User} from "../model/user";
 import {CustomHttpResponse} from "../model/custom-http-response";
@@ -21,6 +21,14 @@ export class UserService {
    */
   public getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.host}/user/all`);
+  }
+
+  /**
+   * Fetch a user search by username
+   * @param username string: user's username to fetch
+   */
+  public getUserByUsername(username: string): Observable<User> {
+    return this.http.get<User>(`${this.host}/user/find/` + username);
   }
 
   /**
@@ -86,14 +94,6 @@ export class UserService {
       return JSON.parse(localStorage.getItem('users') || '{}');
     }
     return [];
-  }
-  /**
-   * Remove users from the Local Storage
-   */
-  public removeUsersFromLocalStorage(): void {
-    if (localStorage.getItem('users')) {
-      localStorage.removeItem('users');
-    }
   }
 
   /**
