@@ -12,7 +12,7 @@
         <div class="flex flex-wrap justify-center">
           <div class="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
             <div class="absolute -mt-20 h-40 w-40 rounded-full overflow-hidden border-2 border-gray-400 bg-[#20354b]">
-              <img id="profilePicturePreview" src="{{user.profileImageUrl}}" alt="..." class="w-full align-middle0">
+              <img id="profilePicturePreview" src="{{user.profileImageUrl}}" alt="..." class="h-full w-full object-cover align-middle0">
             </div>
             <div (click)="updateProfilePicture()" class="absolute h-8 w-8 mt-10 ml-28 mx-auto text-center rounded-full overflow-hidden bg-[#20354b] hover:bg-green-600 border-2 border-gray-400 cursor-pointer">
               <i class="fas fa-pencil-alt text-white align-middle"></i>
@@ -23,6 +23,9 @@
               (change)="onProfileImageChange($event); onUpdateProfileImage()"
               name="profile-picture-input" id="profile-picture-input" placeholder="file" accept="*">
             </form>
+            <div *ngIf="fileStatus?.status === 'progress'" class="h-1 mt-24 w-full bg-gray-200 mt-8 rounded-full">
+              <div class="h-1 rounded-full bg-yellow-500 " [style.width.%]="fileStatus?.percentage"></div>
+            </div>
           </div>
           <div class="w-full lg:w-4/12 px-4 lg:order-3 lg:text-right lg:self-center">
             <div class="py-6 px-3 mt-32 sm:mt-0">

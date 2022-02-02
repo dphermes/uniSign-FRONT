@@ -4,7 +4,6 @@ import {HttpClient, HttpResponse} from "@angular/common/http";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {Observable} from "rxjs";
 import {User} from "../model/user";
-import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +15,7 @@ export class AuthenticationService {
   private loggedInUsername = '';
   private jwtHelper = new JwtHelperService();
 
-  constructor(private http: HttpClient,
-              private router: Router) { }
+  constructor(private http: HttpClient) { }
 
   /**
    * Login http service call

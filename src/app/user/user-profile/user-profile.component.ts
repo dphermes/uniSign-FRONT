@@ -1,24 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {User} from "../../model/user";
 import {AuthenticationService} from "../../service/authentication.service";
 import {Router} from "@angular/router";
-import {NgForm} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {UserService} from "../../service/user.service";
 import {NotificationType} from "../../enum/notification-type.enum";
-import {HttpErrorResponse, HttpEvent} from "@angular/common/http";
+import {HttpErrorResponse, HttpEvent, HttpEventType} from "@angular/common/http";
 import {NotificationService} from "../../service/notification.service";
+import {FileUploadStatus} from "../../model/file-upload.status";
 
 @Component({
   selector: 'app-user-profile',
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss']
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent implements OnInit, OnDestroy {
 
   user = new User();
   profilePicture!: File;
   private subscriptions: Subscription[] = [];
+  public fileStatus = new FileUploadStatus();
 
   constructor(private authService: AuthenticationService,
               private userService: UserService,
@@ -26,11 +27,12 @@ export class UserProfileComponent implements OnInit {
               private router: Router) { }
 
   ngOnInit(): void {
+
     this.user = this.authService.getUserFromLocalStorage();
   }
 
   updateProfilePicture(): void {
-    this.clickButton('profile-picture-input');
+    UserProfileComponent.clickButton('profile-picture-input');
   }
 
   onProfileImageChange(event: any): void {
@@ -47,7 +49,7 @@ export class UserProfileComponent implements OnInit {
     this.subscriptions.push(
       this.userService.updateProfileImage(formData).subscribe(
         (event: HttpEvent<any>) => {
-          this.sendNotification(NotificationType.SUCCESS, `Profile picture updated successfully!`);
+          this.reportUploadProgress(event);
         },
         (error: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, error.error.message);
@@ -56,7 +58,32 @@ export class UserProfileComponent implements OnInit {
     );
   }
 
-  private clickButton(buttonId: string): void {
+
+  private reportUploadProgress(event: HttpEvent<any>) {
+    switch (event.type) {
+      case HttpEventType.UploadProgress:
+        // @ts-ignore
+        this.fileStatus.percentage = Math.round(100* event.loaded / event.total);
+        this.fileStatus.status = 'progress';
+        break;
+      case HttpEventType.Response:
+        if (event.status === 200) {
+          this.user.profileImageUrl = `${event.body.profileImageUrl}?time=${new Date().getTime()}`;
+          this.authService.addUserToLocalStorage(event.body);
+          this.sendNotification(NotificationType.SUCCESS, `${event.body.firstName}'s profile picture updated successfully!`);
+          this.fileStatus.status = 'complete';
+          break;
+        } else {
+          this.sendNotification(NotificationType.ERROR, `Unable to upload image. Please try again`);
+          break;
+        }
+      default:
+        `Finished all processes`;
+        break;
+    }
+  }
+
+  private static clickButton(buttonId: string): void {
     // @ts-ignore
     document.getElementById(buttonId).click();
   }
@@ -78,5 +105,9 @@ export class UserProfileComponent implements OnInit {
     } else {
       this.notificationService.notify(notificationType, 'An error occurred. Please try again.');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

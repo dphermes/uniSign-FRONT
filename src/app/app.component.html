@@ -1,10 +1,10 @@
 <div class="relative">
   <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 
-  <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-gray-200">
-    <div :class="sidebarOpen ? 'block' : 'hidden'" (click)="sidebarOpen = false" class="fixed z-20 inset-0 bg-black opacity-50 transition-opacity lg:hidden"></div>
+  <div class="flex h-screen bg-gray-200">
+    <div (click)="sidebarOpen = false" class="fixed z-20 inset-0 bg-black opacity-50 transition-opacity lg:hidden"></div>
 
-    <div *ngIf="authService.isUserLoggedIn()" :class="sidebarOpen ? 'translate-x-0 ease-out' : '-translate-x-full ease-in'" class="fixed z-30 inset-y-0 left-0 w-64 transition duration-300 transform bg-gray-900 overflow-y-auto lg:translate-x-0 lg:static lg:inset-0">
+    <div *ngIf="authService.isUserLoggedIn()" class="fixed z-30 inset-y-0 left-0 w-64 transition duration-300 transform bg-gray-900 overflow-y-auto lg:translate-x-0 lg:static lg:inset-0">
       <div class="flex items-center justify-center mt-8">
         <div class="flex items-center">
           <svg class="h-12 w-12" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -99,7 +99,7 @@
         </div>
 
         <div class="flex items-center">
-          <div x-data="{ notificationOpen: false }" class="relative">
+          <div class="relative">
             <button (click)="notificationOpen = !notificationOpen"
                     class="flex mx-4 text-gray-600 focus:outline-none">
               <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -122,8 +122,8 @@
                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=334&amp;q=80"
                      alt="avatar">
                 <p class="text-sm mx-2">
-                  <span class="font-bold" href="#">Sara Salah</span> replied on the <span
-                  class="font-bold text-indigo-400" href="#">Upload Image</span> artical . 2m
+                  <span class="font-bold">Sara Salah</span> replied on the <span
+                  class="font-bold text-indigo-400">Upload Image</span> artical . 2m
                 </p>
               </a>
               <a href="#"
@@ -132,7 +132,7 @@
                      src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=634&amp;q=80"
                      alt="avatar">
                 <p class="text-sm mx-2">
-                  <span class="font-bold" href="#">Slick Net</span> start following you . 45m
+                  <span class="font-bold">Slick Net</span> start following you . 45m
                 </p>
               </a>
               <a href="#"
@@ -141,8 +141,8 @@
                      src="https://images.unsplash.com/photo-1450297350677-623de575f31c?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=334&amp;q=80"
                      alt="avatar">
                 <p class="text-sm mx-2">
-                  <span class="font-bold" href="#">Jane Doe</span> Like Your reply on <span
-                  class="font-bold text-indigo-400" href="#">Test with TDD</span> artical . 1h
+                  <span class="font-bold">Jane Doe</span> Like Your reply on <span
+                  class="font-bold text-indigo-400">Test with TDD</span> artical . 1h
                 </p>
               </a>
               <a href="#"
@@ -151,18 +151,18 @@
                      src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=398&amp;q=80"
                      alt="avatar">
                 <p class="text-sm mx-2">
-                  <span class="font-bold" href="#">Abigail Bennett</span> start following you . 3h
+                  <span class="font-bold">Abigail Bennett</span> start following you . 3h
                 </p>
               </a>
             </div>
           </div>
 
-          <div x-data="{ dropdownOpen: false }" class="relative">
+          <div class="relative">
             <button (click)="dropdownOpen = !dropdownOpen"
                     class="relative block h-8 w-8 rounded-full overflow-hidden shadow focus:outline-none bg-[#20354b]">
               <img class="h-full w-full object-cover"
                    src="{{user.profileImageUrl}}"
-                   alt="Your avatar">
+                   alt="{{user.firstName}} profile picture">
             </button>
 
             <div *ngIf="dropdownOpen" (click)="dropdownOpen = false"
