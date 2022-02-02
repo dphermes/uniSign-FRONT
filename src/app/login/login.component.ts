@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           if (response.body) {
             this.authService.addUserToLocalStorage(response.body)
           }
-          this.router.navigateByUrl('/user/management');
+          this.router.navigateByUrl('/user/profile');
           this.sendErrorNotification(NotificationType.SUCCESS, `Welcome back ${response.body?.firstName}!`);
           this.showLoading = false;
         },

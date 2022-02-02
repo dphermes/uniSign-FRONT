@@ -18,6 +18,8 @@ import {CustomHttpResponse} from "../../model/custom-http-response";
 export class UserManagementComponent implements OnInit, OnDestroy {
 
   public users: User[] = [];
+  editUser = new User();
+  private currentUsername = '';
   showLoading = false;
   private subscriptions: Subscription[] = [];
   profilePicture!: File;
@@ -79,18 +81,31 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  public activateDeactivateUser(userToUnlock: User) {
-    const formData = this.userService.createUserFormData(userToUnlock.username, userToUnlock, this.profilePicture);
-    if (userToUnlock.active) {
-      formData.set('isActive', 'false');
-    } else {
-      formData.set('isActive', 'true');
+  public changeUserStatus(editUser: User, statusToChange: string) {
+    this.editUser = editUser;
+    this.currentUsername = editUser.username;
+    switch (statusToChange) {
+      case 'isActive' :
+        this.editUser.notLocked = editUser.notLocked;
+        this.editUser.active = !editUser.active;
+        break;
+      case 'isNotLocked' :
+        this.editUser.active = editUser.active;
+        this.editUser.notLocked = !editUser.notLocked;
+        break;
+      default:
+        break;
     }
+    this.clickButton(statusToChange + 'Submit' + editUser.userId);
+  }
+
+  updateUser(): void {
+    const formData = this.userService.createUserFormData(this.currentUsername, this.editUser, this.profilePicture);
     this.subscriptions.push(
       this.userService.updateUser(formData).subscribe(
         (response: User) => {
           this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully!`);
-          this.getUsers(false);
+          this.getUsers(true);
         },
         (error: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, error.error.message);
@@ -98,38 +113,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         }
       )
     );
-  }
-
-  public lockUnlockUser(userToUnlock: User) {
-    const formData = this.userService.createUserFormData(userToUnlock.username, userToUnlock, this.profilePicture);
-    if (userToUnlock.notLocked) {
-      formData.set('isNonLocked', 'false');
-    } else {
-      formData.set('isNonLocked', 'true');
-    }
-    this.subscriptions.push(
-      this.userService.updateUser(formData).subscribe(
-        (response: User) => {
-          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully!`);
-          this.getUsers(false);
-        },
-        (error: HttpErrorResponse) => {
-          this.sendNotification(NotificationType.ERROR, error.error.message);
-          this.showLoading = false;
-        }
-      )
-    );
-  }
-
-  private createUpdateFormData(user: User): FormData {
-    const formData = new FormData();
-    formData.append('currentUsername', user.username);
-    formData.append('firstName', user.firstName);
-    formData.append('lastName', user.lastName);
-    formData.append('username', user.username);
-    formData.append('email', user.email);
-    formData.append('role', user.role);
-    return formData;
   }
 
   /**
@@ -216,6 +199,16 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.profilePicture = event.target.files[0];
     // @ts-ignore
     output.src = URL.createObjectURL(this.profilePicture);
+  }
+
+  /**
+   * Aims the button in hidden profile image form to click it programmatically
+   * @param buttonId string: button id
+   * @private
+   */
+  private clickButton(buttonId: string): void {
+    // @ts-ignore
+    document.getElementById(buttonId).click();
   }
 
   /**
