@@ -146,10 +146,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
    * Delete a user from the database
    * @param userToDelete User: User to delete
    */
-  onDeleteUser(userToDelete: User): void {
+  onDeleteUser(username: string): void {
     this.showLoading = true;
     this.subscriptions.push(
-      this.userService.deleteUser(userToDelete.id).subscribe(
+      this.userService.deleteUser(username).subscribe(
         (response: CustomHttpResponse) => {
           this.onCloseModals();
           this.sendNotification(NotificationType.SUCCESS, response.message);
