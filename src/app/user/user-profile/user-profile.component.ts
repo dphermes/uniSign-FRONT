@@ -8,6 +8,7 @@ import {NotificationType} from "../../enum/notification-type.enum";
 import {HttpErrorResponse, HttpEvent, HttpEventType} from "@angular/common/http";
 import {NotificationService} from "../../service/notification.service";
 import {FileUploadStatus} from "../../model/file-upload.status";
+import {NgForm} from "@angular/forms";
 
 @Component({
   selector: 'app-user-profile',
@@ -63,7 +64,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    * Binded click action on visible button to trigger the hidden submit button in hidden form
    */
   onUpdateProfilePicture(): void {
-    this.clickButton('profile-picture-input');
+    UserProfileComponent.clickButton('profile-picture-input');
   }
 
   /**
@@ -100,7 +101,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   onEditUser(editUser: User) {
     this.editUser = editUser;
     this.currentUsername = editUser.username;
-    this.clickButton('openEditModal');
+    UserProfileComponent.clickButton('openEditModal');
   }
 
   updateUser(): void {
@@ -155,7 +156,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    * @param buttonId string: button id
    * @private
    */
-  private clickButton(buttonId: string): void {
+  private static clickButton(buttonId: string): void {
     // @ts-ignore
     document.getElementById(buttonId).click();
   }
