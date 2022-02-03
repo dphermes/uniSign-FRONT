@@ -8,7 +8,7 @@ import {NotificationType} from "../../enum/notification-type.enum";
 import {HttpErrorResponse, HttpEvent, HttpEventType} from "@angular/common/http";
 import {NotificationService} from "../../service/notification.service";
 import {FileUploadStatus} from "../../model/file-upload.status";
-import {NgForm} from "@angular/forms";
+import {ModalService} from "../../service/modal.service";
 
 @Component({
   selector: 'app-user-profile',
@@ -26,11 +26,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   public fileStatus = new FileUploadStatus();
   usernameParam = '';
   isloggedInUser = false;
-  private openedModals: string[] = [];
 
   constructor(private authService: AuthenticationService,
               private userService: UserService,
               private notificationService: NotificationService,
+              private modalService: ModalService,
               private route: ActivatedRoute,
               private router: Router) {
     this.subscriptions.push(
@@ -112,7 +112,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         (response: User) => {
           this.onCloseModals();
           this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully`);
-          this.router.navigateByUrl('user/profile/' + response.username);
+          this.router.navigateByUrl('user/profile/' + response.username).then();
           // this.getUsers(false);
         },
         (error: HttpErrorResponse) => {
@@ -166,7 +166,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    */
   onLogout(): void {
     this.authService.logout();
-    this.router.navigateByUrl('login');
+    this.router.navigateByUrl('login').then();
   }
 
   /**
@@ -188,27 +188,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    * @param modalName string: name of the modal we want to open
    */
   onOpenModal(modalName: string): void {
-    this.onCloseModals();
-    this.openedModals.push(modalName);
-    if (modalName.includes('userDropDown')) {
-      // @ts-ignore
-      document.getElementById('modalOverlay').style.display='block';
-      this.openedModals.push('modalOverlay');
-    }
-    // @ts-ignore
-    document.getElementById(modalName).style.display='block';
-    console.log(this.openedModals);
+    this.modalService.openModal(modalName);
   }
 
   /**
    * Closes all modals opened and stored in openedModals array
    */
   onCloseModals(): void {
-    for (let modal of this.openedModals) {
-      // @ts-ignore
-      document.getElementById(modal).style.display='none';
-    }
-    this.openedModals = [];
+    this.modalService.closeModals();
   }
 
   ngOnDestroy(): void {
