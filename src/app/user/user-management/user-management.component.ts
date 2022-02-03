@@ -10,6 +10,7 @@ import {HttpErrorResponse} from "@angular/common/http";
 import {NgForm} from "@angular/forms";
 import {CustomHttpResponse} from "../../model/custom-http-response";
 import {ModalService} from "../../service/modal.service";
+import {RoleService} from "../../service/role.service";
 
 @Component({
   selector: 'app-user-management',
@@ -28,8 +29,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   constructor(private router: Router,
               private userService: UserService,
               private authService: AuthenticationService,
+              public roleService: RoleService,
               private notificationService: NotificationService,
-              private modalService: ModalService) { }
+              private modalService: ModalService) {
+  }
 
   ngOnInit(): void {
     this.getUsers(false);
@@ -70,9 +73,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     for (const user of this.userService.getUsersFromLocalStorage()) {
       // Put everything to lowercase because indexOf is case sensitive
       if (user.firstName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
+        user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
         results.push(user);
       }
     }

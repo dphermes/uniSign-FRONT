@@ -14,7 +14,7 @@
             <div class="absolute -mt-20 h-40 w-40 rounded-full overflow-hidden border-2 border-gray-400 bg-[#20354b]">
               <img id="profilePicturePreview" src="{{user.profileImageUrl}}" alt="..." class="h-full w-full object-cover align-middle0">
             </div>
-            <div *ngIf="isloggedInUser" (click)="onUpdateProfilePicture()" class="absolute h-8 w-8 mt-10 ml-28 mx-auto text-center rounded-full overflow-hidden bg-[#20354b] hover:bg-green-600 border-2 border-gray-400 cursor-pointer">
+            <div *ngIf="isloggedInUser || roleService.isAdminOrManager" (click)="onUpdateProfilePicture()" class="absolute h-8 w-8 mt-10 ml-28 mx-auto text-center rounded-full overflow-hidden bg-[#20354b] hover:bg-green-600 border-2 border-gray-400 cursor-pointer">
               <i class="fas fa-pencil-alt text-white align-middle"></i>
             </div>
             <!-- Hidden Form to change Profile Picture -->
@@ -29,7 +29,7 @@
           </div>
           <div class="w-full lg:w-4/12 px-4 lg:order-3 lg:text-right lg:self-center">
             <div class="py-6 px-3 mt-32 sm:mt-0">
-              <button id="editUserButton" (click)="onEditUser(user)" class="bg-transparent border-2 border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded-xl outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150" type="button">
+              <button *ngIf="isloggedInUser || roleService.isAdminOrManager" id="editUserButton" (click)="onEditUser(user)" class="bg-transparent border-2 border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded-xl outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg> Edit user
@@ -90,7 +90,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
             </svg> {{user.role}}
           </div>
-          <div class="mb-2 text-blueGray-600 flex items-center justify-center">
+          <div *ngIf="isloggedInUser || roleService.isAdminOrManager" class="mb-2 text-blueGray-600 flex items-center justify-center">
             <svg *ngIf="user?.active" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-1 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -340,7 +340,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 mt-5 text-slate-500">
+            <div *ngIf="roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
               <div class="inline-block">
                 <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Role</label>
                 <span *ngIf="editUserForm.invalid && roleInput.touched && !roleInput.value" class="text-sm text-red-600" id="roleError">Role required</span>
@@ -357,8 +357,18 @@
                 <option value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
               </select>
             </div>
+            <div *ngIf="!roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
+              <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Role</label>
+              <input type="text"
+                     name="role"
+                     required
+                     ngModel="ROLE_USER" #roleInput="ngModel"
+                     readonly
+                     value="ROLE_USER"
+                     class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500">
+            </div>
 
-            <div class="flex flex-row space-x-4 text-center mt-2">
+            <div *ngIf="roleService.isAdminOrManager" class="flex flex-row space-x-4 text-center mt-2">
               <div class="relative z-30 w-full mb-2">
                 <label class="inline-flex items-center mt-2">
                   <input
@@ -398,4 +408,4 @@
     </div>
   </div>
 </div>
-<!-- END Add User Modal -->
+<!-- END Edit User Modal -->

@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthenticationService} from "./service/authentication.service";
 import {Router} from "@angular/router";
 import {User} from "./model/user";
+import {RoleService} from "./service/role.service";
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ export class AppComponent implements OnInit {
   user = new User();
 
   constructor(public authService: AuthenticationService,
+              public roleService: RoleService,
               private router: Router) {
   }
 

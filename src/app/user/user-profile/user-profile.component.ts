@@ -9,6 +9,7 @@ import {HttpErrorResponse, HttpEvent, HttpEventType} from "@angular/common/http"
 import {NotificationService} from "../../service/notification.service";
 import {FileUploadStatus} from "../../model/file-upload.status";
 import {ModalService} from "../../service/modal.service";
+import {RoleService} from "../../service/role.service";
 
 @Component({
   selector: 'app-user-profile',
@@ -28,6 +29,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   isloggedInUser = false;
 
   constructor(private authService: AuthenticationService,
+              public roleService: RoleService,
               private userService: UserService,
               private notificationService: NotificationService,
               private modalService: ModalService,

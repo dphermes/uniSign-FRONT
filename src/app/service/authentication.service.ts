@@ -4,6 +4,7 @@ import {HttpClient, HttpResponse} from "@angular/common/http";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {Observable} from "rxjs";
 import {User} from "../model/user";
+import {ModalService} from "./modal.service";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class AuthenticationService {
   private loggedInUsername = '';
   private jwtHelper = new JwtHelperService();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private modalService: ModalService) { }
 
   /**
    * Login http service call
@@ -54,6 +56,7 @@ export class AuthenticationService {
    * Logout User and clean local storage
    */
   public logout(): void {
+    this.modalService.closeModals();
     this.token = '';
     this.loggedInUsername = '';
     localStorage.removeItem('user');
