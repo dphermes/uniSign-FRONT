@@ -13,6 +13,11 @@ export class AuthInterceptor implements HttpInterceptor {
 
   constructor(private authService: AuthenticationService) {}
 
+  /**
+   * Intercept all requests to the backend and add JWT in headers for protected pages
+   * @param request HttpRequest<any>
+   * @param next HttpHandler
+   */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (request.url.includes(`${this.authService.host}/user/login`) ||
       request.url.includes(`${this.authService.host}/user/register`) ||

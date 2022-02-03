@@ -8,16 +8,16 @@
             <span class="text-sm text-gray-900">Welcome back</span>
             <h1 class="text-2xl font-bold">Login to your account</h1>
           </div>
-          <div class="flex items-center border-2 py-2 px-3 mt-3 rounded-2xl">
+          <div class="flex items-center border-2 py-2 px-3 mt-3 rounded-2xl {{loginForm.invalid && usernameInput.touched && !usernameInput.value ? 'border-red-500' : 'border-gray-100'}}">
             <i class="fas fa-user text-gray-400"></i>
-            <input class="pl-2 outline-none border-none" type="text" name="username" id="username" ngModel #usernameInput="ngModel" placeholder="Username" required/>
+            <input class="pl-2 outline-none border-none focus:border-none focus:outline-none" type="text" name="username" id="username" ngModel #usernameInput="ngModel" placeholder="Username" required/>
           </div>
-          <small class="p-2 text-red-500" *ngIf="usernameInput.invalid && usernameInput.touched">* Please, enter a username</small>
-          <div class="flex items-center border-2 py-2 px-3 mt-3 rounded-2xl">
+          <small class="p-2 text-red-500" *ngIf="loginForm.invalid && usernameInput.touched && !usernameInput.value">* Please, enter a username</small>
+          <div class="flex items-center border-2 py-2 px-3 mt-3 rounded-2xl {{loginForm.invalid && passwordInput.touched && !passwordInput.value ? 'border-red-500' : 'border-gray-100'}}">
             <i class="fas fa-lock text-gray-400"></i>
             <input class="pl-2 outline-none border-none" type="password" name="password" id="password" ngModel #passwordInput="ngModel" placeholder="Password" required/>
           </div>
-          <small class="p-2 text-red-500" *ngIf="passwordInput.invalid && passwordInput.touched">* Please, enter a password</small>
+          <small class="p-2 text-red-500" *ngIf="loginForm.invalid && passwordInput.touched && !passwordInput.value">* Please, enter a password</small>
           <div class="flex justify-between mt-3">
             <label class="inline-flex items-center mt-2">
               <input type="checkbox" class="form-checkbox h-4 w-4 text-red-600"><span class="text-sm ml-2 text-gray-700">Remember Me</span>

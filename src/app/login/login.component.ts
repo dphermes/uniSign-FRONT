@@ -24,9 +24,9 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.authService.isUserLoggedIn()) {
-      this.router.navigateByUrl('/user/management');
+      this.router.navigateByUrl('/user/management').then();
     } else {
-      this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/login').then();
     }
   }
 
@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           if (response.body) {
             this.authService.addUserToLocalStorage(response.body)
           }
-          this.router.navigateByUrl('/user/profile');
+          this.router.navigateByUrl('/user/profile').then();
           this.sendErrorNotification(NotificationType.SUCCESS, `Welcome back ${response.body?.firstName}!`);
           this.showLoading = false;
         },
@@ -58,6 +58,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Calls notificationService to send notification while logging in
+   * @param notificationType NotificationType: type of notification (SUCCESS, ERROR, ...)
+   * @param message string: message to show to user
+   * @private
+   */
   private sendErrorNotification(notificationType: NotificationType, message: string): void {
     if (message) {
       this.notificationService.notify(notificationType, message);
@@ -69,4 +75,5 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
+
 }

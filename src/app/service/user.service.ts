@@ -36,10 +36,6 @@ export class UserService {
    * @return User: added user or HttpErrorResponse
    */
   public addUser(formData: FormData): Observable<User> {
-    // console.log('FORMDATA in USER SERVICE');
-    // for (var pair of formData.entries()) {
-    //     console.log(pair[0]+ ', ' + pair[1]);
-    //   }
     return this.http.post<User>(`${this.host}/user/add`, formData);
   }
 

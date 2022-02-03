@@ -192,6 +192,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Sends the image in image source when uploading a new profile image
+   * @param event any: Event triggered when changing profile image
+   */
   onProfileImageChange(event: any): void {
     const output = document.getElementById('profilePicturePreview');
     this.profilePicture = event.target.files[0];

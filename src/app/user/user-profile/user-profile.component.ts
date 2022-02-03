@@ -98,12 +98,19 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Load user's info to send it in the form and opens the modal
+   * @param editUser
+   */
   onEditUser(editUser: User) {
     this.editUser = editUser;
     this.currentUsername = editUser.username;
     UserProfileComponent.clickButton('openEditModal');
   }
 
+  /**
+   * Update user's info in the database
+   */
   updateUser(): void {
     // @ts-ignore
     const formData = this.userService.createUserFormData(this.currentUsername, this.editUser, this.profilePicture);
@@ -184,7 +191,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Opens a modal in template and stores it in an array to close later
+   * Calls modal service to open a modal
    * @param modalName string: name of the modal we want to open
    */
   onOpenModal(modalName: string): void {
@@ -192,7 +199,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Closes all modals opened and stored in openedModals array
+   * Calls modal service to close all opened modals
    */
   onCloseModals(): void {
     this.modalService.closeModals();
@@ -201,4 +208,5 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
+
 }
