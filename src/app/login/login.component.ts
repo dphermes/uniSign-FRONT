@@ -24,9 +24,9 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.authService.isUserLoggedIn()) {
-      this.router.navigateByUrl('/user/management');
+      this.router.navigateByUrl('/user/management').then();
     } else {
-      this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/login').then();
     }
   }
 
@@ -46,19 +46,32 @@ export class LoginComponent implements OnInit, OnDestroy {
           if (response.body) {
             this.authService.addUserToLocalStorage(response.body)
           }
-          this.router.navigateByUrl('/user/profile');
-          this.sendErrorNotification(NotificationType.SUCCESS, `Welcome back ${response.body?.firstName}!`);
+          this.router.navigateByUrl('/user/profile').then();
+          this.sendNotification(NotificationType.SUCCESS, `Welcome back ${response.body?.firstName}!`);
           this.showLoading = false;
         },
         (error: HttpErrorResponse) => {
-          this.sendErrorNotification(NotificationType.ERROR, error.error.message);
+          this.sendNotification(NotificationType.ERROR, error.error.message);
           this.showLoading = false;
         }
       )
     );
   }
 
-  private sendErrorNotification(notificationType: NotificationType, message: string): void {
+  /**
+   * If user forgot his password, inform him to contact an admin
+   */
+  forgotPasswordNotification() {
+    this.sendNotification(NotificationType.INFO, 'Please, contact an admin to reset your password');
+  }
+
+  /**
+   * Calls notificationService to send notification while logging in
+   * @param notificationType NotificationType: type of notification (SUCCESS, ERROR, ...)
+   * @param message string: message to show to user
+   * @private
+   */
+  private sendNotification(notificationType: NotificationType, message: string): void {
     if (message) {
       this.notificationService.notify(notificationType, message);
     } else {
@@ -69,4 +82,5 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
+
 }

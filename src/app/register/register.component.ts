@@ -25,10 +25,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.authService.isUserLoggedIn()) {
-      this.router.navigateByUrl('/user/management');
+      this.router.navigateByUrl('/user/management').then();
     }
   }
 
+  /**
+   * Register a new user if not logged in
+   * @param user
+   */
   onRegister(user: User) {
     this.emailExists = false;
     this.usernameExists = false;
@@ -37,7 +41,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.authService.register(user).subscribe(
         (response: User) => {
           this.showLoading = false;
-          this.router.navigateByUrl('/login');
+          this.router.navigateByUrl('/login').then();
           this.sendNotification(NotificationType.SUCCESS, `Welcome ${response.firstName}! Check your emails for password.`);
         },
         (error: HttpErrorResponse) => {
@@ -54,6 +58,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Calls notificationService to send notification while registering new user
+   * @param notificationType NotificationType: type of notification (SUCCESS, ERROR, ...)
+   * @param message string: message to show to user
+   * @private
+   */
   private sendNotification(notificationType: NotificationType, message: string): void {
     if (message) {
       this.notificationService.notify(notificationType, message);
@@ -65,4 +75,5 @@ export class RegisterComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
+
 }

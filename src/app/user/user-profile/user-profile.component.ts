@@ -8,6 +8,7 @@ import {NotificationType} from "../../enum/notification-type.enum";
 import {HttpErrorResponse, HttpEvent, HttpEventType} from "@angular/common/http";
 import {NotificationService} from "../../service/notification.service";
 import {FileUploadStatus} from "../../model/file-upload.status";
+import {ModalService} from "../../service/modal.service";
 
 @Component({
   selector: 'app-user-profile',
@@ -25,11 +26,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   public fileStatus = new FileUploadStatus();
   usernameParam = '';
   isloggedInUser = false;
-  private openedModals: string[] = [];
 
   constructor(private authService: AuthenticationService,
               private userService: UserService,
               private notificationService: NotificationService,
+              private modalService: ModalService,
               private route: ActivatedRoute,
               private router: Router) {
     this.subscriptions.push(
@@ -63,7 +64,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    * Binded click action on visible button to trigger the hidden submit button in hidden form
    */
   onUpdateProfilePicture(): void {
-    this.clickButton('profile-picture-input');
+    UserProfileComponent.clickButton('profile-picture-input');
   }
 
   /**
@@ -97,12 +98,19 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Load user's info to send it in the form and opens the modal
+   * @param editUser
+   */
   onEditUser(editUser: User) {
     this.editUser = editUser;
     this.currentUsername = editUser.username;
-    this.clickButton('openEditModal');
+    UserProfileComponent.clickButton('openEditModal');
   }
 
+  /**
+   * Update user's info in the database
+   */
   updateUser(): void {
     // @ts-ignore
     const formData = this.userService.createUserFormData(this.currentUsername, this.editUser, this.profilePicture);
@@ -111,7 +119,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         (response: User) => {
           this.onCloseModals();
           this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully`);
-          this.router.navigateByUrl('user/profile/' + response.username);
+          this.router.navigateByUrl('user/profile/' + response.username).then();
           // this.getUsers(false);
         },
         (error: HttpErrorResponse) => {
@@ -155,7 +163,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    * @param buttonId string: button id
    * @private
    */
-  private clickButton(buttonId: string): void {
+  private static clickButton(buttonId: string): void {
     // @ts-ignore
     document.getElementById(buttonId).click();
   }
@@ -165,7 +173,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    */
   onLogout(): void {
     this.authService.logout();
-    this.router.navigateByUrl('login');
+    this.router.navigateByUrl('login').then();
   }
 
   /**
@@ -183,34 +191,22 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Opens a modal in template and stores it in an array to close later
+   * Calls modal service to open a modal
    * @param modalName string: name of the modal we want to open
    */
   onOpenModal(modalName: string): void {
-    this.onCloseModals();
-    this.openedModals.push(modalName);
-    if (modalName.includes('userDropDown')) {
-      // @ts-ignore
-      document.getElementById('modalOverlay').style.display='block';
-      this.openedModals.push('modalOverlay');
-    }
-    // @ts-ignore
-    document.getElementById(modalName).style.display='block';
-    console.log(this.openedModals);
+    this.modalService.openModal(modalName);
   }
 
   /**
-   * Closes all modals opened and stored in openedModals array
+   * Calls modal service to close all opened modals
    */
   onCloseModals(): void {
-    for (let modal of this.openedModals) {
-      // @ts-ignore
-      document.getElementById(modal).style.display='none';
-    }
-    this.openedModals = [];
+    this.modalService.closeModals();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
+
 }

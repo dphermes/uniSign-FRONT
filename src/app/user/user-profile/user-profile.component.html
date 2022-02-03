@@ -21,7 +21,7 @@
             <form enctype="multipart/form-data" class="hidden">
               <input type="file"
               (change)="onProfileImageChange($event, 'profilePicturePreview'); onUpdateProfileImage()"
-              name="profile-picture-input" id="profile-picture-input" placeholder="file" accept="*">
+              name="profile-picture-input" id="profile-picture-input" placeholder="file" accept="image/*">
             </form>
             <div *ngIf="fileStatus?.status === 'progress'" class="h-1 mt-24 w-full bg-gray-200 mt-8 rounded-full">
               <div class="h-1 rounded-full bg-yellow-500 " [style.width.%]="fileStatus?.percentage"></div>
@@ -57,7 +57,7 @@
           </div>
         </div>
         <div class="text-center">
-          <h3 class="text-4xl font-semibold leading-normal mb-2 text-blueGray-700 mb-0">
+          <h3 class="text-4xl font-semibold leading-normal mb-2 text-slate-600 mb-0">
             {{user.firstName}} {{user.lastName}}
           </h3>
           <div class="mb-2 text-blueGray-600 flex items-center justify-center">
@@ -244,8 +244,8 @@
   <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100">
     <div
       class="relative bg-white shadow-lg rounded-lg text-gray-900 z-30">
-      <header class="flex flex-col justify-center items-center p-3 text-green-500">
-        <div class="flex justify-center w-28 h-28 border-4 border-green-500 rounded-full mb-4">
+      <header class="flex flex-col justify-center items-center p-3 text-emerald-500">
+        <div class="flex justify-center w-28 h-28 border-4 border-emerald-500 rounded-full mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
@@ -272,6 +272,7 @@
                         file:text-sm file:font-semibold
                         file:bg-violet-50 file:text-violet-700
                         hover:file:bg-violet-100"
+                  accept="image/*"
                   (change)="onProfileImageChange($event, 'profilePictureEditPreview')"
                 />
               </label>
@@ -279,57 +280,77 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
               <div class="grid grid-cols-1">
-                <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">First Name</label>
+                <div class="inline-block">
+                  <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">First name</label>
+                  <span *ngIf="editUserForm.invalid && firstNameInput.touched && !firstNameInput.value" class="text-sm text-red-600" id="firstNameError">First name required</span>
+                </div>
                 <input type="text"
                        id="firstName"
                        name="firstName"
                        placeholder=" "
+                       #firstNameInput="ngModel"
                        [(ngModel)]="editUser.firstName"
                        required
-                       class="py-2 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"/>
+                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editUserForm.invalid && firstNameInput.touched && !firstNameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
               </div>
               <div class="grid grid-cols-1">
-                <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Last Name</label>
+                <div class="inline-block">
+                  <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Last name</label>
+                  <span *ngIf="editUserForm.invalid && lastNameInput.touched && !lastNameInput.value" class="text-sm text-red-600" id="lastNameError">Last name required</span>
+                </div>
                 <input type="text"
                        id="lastName"
                        name="lastName"
                        placeholder=" "
+                       #lastNameInput="ngModel"
                        [(ngModel)]="editUser.lastName"
                        required
-                       class="py-2 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"/>
+                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editUserForm.invalid && lastNameInput.touched && !lastNameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
               <div class="grid grid-cols-1">
-                <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Username</label>
+                <div class="inline-block">
+                  <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Username</label>
+                  <span *ngIf="editUserForm.invalid && usernameInput.touched && !usernameInput.value" class="text-sm text-red-600" id="usernameError">Username required</span>
+                </div>
                 <input type="text"
                        id="username"
                        name="username"
                        placeholder=" "
+                       #usernameInput="ngModel"
                        [(ngModel)]="editUser.username"
                        required
-                       class="py-2 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"/>
+                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editUserForm.invalid && usernameInput.touched && !usernameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
               </div>
               <div class="grid grid-cols-1">
-                <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Last Name *</label>
+                <div class="inline-block">
+                  <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Email</label>
+                  <span *ngIf="editUserForm.invalid && emailInput.touched && !emailInput.value" class="text-sm text-red-600" id="emailError">Email required</span>
+                </div>
                 <input type="email"
                        id="email"
                        name="email"
                        placeholder=" "
+                       #emailInput="ngModel"
                        [(ngModel)]="editUser.email"
                        required
-                       class="py-2 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"/>
+                       class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editUserForm.invalid && emailInput.touched && !emailInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 mt-5">
-              <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Role</label>
+            <div class="grid grid-cols-1 mt-5 text-slate-500">
+              <div class="inline-block">
+                <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Role</label>
+                <span *ngIf="editUserForm.invalid && roleInput.touched && !roleInput.value" class="text-sm text-red-600" id="roleError">Role required</span>
+              </div>
               <select name="role"
                       id="role"
                       value=""
+                      #roleInput="ngModel"
                       [(ngModel)]="editUser.role"
-                      class="py-2 px-3 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                      class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400">
                 <option value="ROLE_USER" selected>USER</option>
                 <option value="ROLE_MANAGER">MANAGER</option>
                 <option value="ROLE_ADMIN">ADMIN</option>
@@ -345,7 +366,7 @@
                     name="active"
                     id="active"
                     [(ngModel)]="editUser.active"
-                    class="form-checkbox h-4 w-4 text-teal-700 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Active</span>
+                    class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-slate-500">Active</span>
                 </label>
               </div>
               <div class="relative z-30 w-full">
@@ -355,7 +376,7 @@
                     name="notLocked"
                     id="notLocked"
                     [(ngModel)]="editUser.notLocked"
-                    class="form-checkbox h-4 w-4 text-teal-700 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Unlocked</span>
+                    class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-slate-500">Unlocked</span>
                 </label>
               </div>
             </div>
@@ -368,7 +389,7 @@
             </button>
             <button type="submit"
                     [disabled]="editUserForm.invalid"
-                    class="bg-green-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-green-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    class="bg-emerald-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-emerald-600 disabled:bg-emerald-300 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
               Confirm
             </button>
           </footer>

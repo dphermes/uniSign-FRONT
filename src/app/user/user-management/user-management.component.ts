@@ -9,6 +9,7 @@ import {NotificationType} from "../../enum/notification-type.enum";
 import {HttpErrorResponse} from "@angular/common/http";
 import {NgForm} from "@angular/forms";
 import {CustomHttpResponse} from "../../model/custom-http-response";
+import {ModalService} from "../../service/modal.service";
 
 @Component({
   selector: 'app-user-management',
@@ -23,12 +24,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   showLoading = false;
   private subscriptions: Subscription[] = [];
   profilePicture!: File;
-  private openedModals: string[] = [];
 
   constructor(private router: Router,
               private userService: UserService,
               private authService: AuthenticationService,
-              private notificationService: NotificationService) { }
+              private notificationService: NotificationService,
+              private modalService: ModalService) { }
 
   ngOnInit(): void {
     this.getUsers(false);
@@ -96,7 +97,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       default:
         break;
     }
-    this.clickButton(statusToChange + 'Submit' + editUser.userId);
+    UserManagementComponent.clickButton(statusToChange + 'Submit' + editUser.userId);
   }
 
   updateUser(): void {
@@ -122,9 +123,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   onAddNewUser(userForm: NgForm): void {
     // @ts-ignore
     const formData = this.userService.createUserFormData(null, userForm.value, this.profilePicture);
-    // for (var pair of formData.entries()) {
-    //   console.log(pair[0]+ ', ' + pair[1]);
-    // }
     this.subscriptions.push(
       this.userService.addUser(formData).subscribe(
         (response: User) => {
@@ -144,12 +142,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   /**
    * Delete a user from the database
-   * @param userToDelete User: User to delete
+   * @param username string: username of User to delete
    */
-  onDeleteUser(userToDelete: User): void {
+  onDeleteUser(username: string): void {
     this.showLoading = true;
     this.subscriptions.push(
-      this.userService.deleteUser(userToDelete.id).subscribe(
+      this.userService.deleteUser(username).subscribe(
         (response: CustomHttpResponse) => {
           this.onCloseModals();
           this.sendNotification(NotificationType.SUCCESS, response.message);
@@ -181,7 +179,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           this.showLoading = false;
           if (loggedInUserEmail == emailAddress) {
             this.authService.logout();
-            this.router.navigateByUrl('login');
+            this.router.navigateByUrl('login').then();
           } else {
             this.getUsers(false);
           }
@@ -194,6 +192,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Sends the image in image source when uploading a new profile image
+   * @param event any: Event triggered when changing profile image
+   */
   onProfileImageChange(event: any): void {
     const output = document.getElementById('profilePicturePreview');
     this.profilePicture = event.target.files[0];
@@ -206,36 +208,24 @@ export class UserManagementComponent implements OnInit, OnDestroy {
    * @param buttonId string: button id
    * @private
    */
-  private clickButton(buttonId: string): void {
+  private static clickButton(buttonId: string): void {
     // @ts-ignore
     document.getElementById(buttonId).click();
   }
 
   /**
-   * Opens a modal in template and stores it in an array to close later
+   * Calls modal service to open modals
    * @param modalName string: name of the modal we want to open
    */
   onOpenModal(modalName: string): void {
-    this.onCloseModals();
-    this.openedModals.push(modalName);
-    if (modalName.includes('userDropDown')) {
-      // @ts-ignore
-      document.getElementById('modalOverlay').style.display='block';
-      this.openedModals.push('modalOverlay');
-    }
-    // @ts-ignore
-    document.getElementById(modalName).style.display='block';
+    this.modalService.openModal(modalName);
   }
 
   /**
-   * Closes all modals opened and stored in openedModals array
+   * Calls modal service to close modals
    */
   onCloseModals(): void {
-    for (let modal of this.openedModals) {
-      // @ts-ignore
-      document.getElementById(modal).style.display='none';
-    }
-    this.openedModals = [];
+    this.modalService.closeModals();
   }
 
   /**
