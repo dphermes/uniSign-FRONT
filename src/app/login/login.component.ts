@@ -47,15 +47,22 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.authService.addUserToLocalStorage(response.body)
           }
           this.router.navigateByUrl('/user/profile').then();
-          this.sendErrorNotification(NotificationType.SUCCESS, `Welcome back ${response.body?.firstName}!`);
+          this.sendNotification(NotificationType.SUCCESS, `Welcome back ${response.body?.firstName}!`);
           this.showLoading = false;
         },
         (error: HttpErrorResponse) => {
-          this.sendErrorNotification(NotificationType.ERROR, error.error.message);
+          this.sendNotification(NotificationType.ERROR, error.error.message);
           this.showLoading = false;
         }
       )
     );
+  }
+
+  /**
+   * If user forgot his password, inform him to contact an admin
+   */
+  forgotPasswordNotification() {
+    this.sendNotification(NotificationType.INFO, 'Please, contact an admin to reset your password');
   }
 
   /**
@@ -64,7 +71,7 @@ export class LoginComponent implements OnInit, OnDestroy {
    * @param message string: message to show to user
    * @private
    */
-  private sendErrorNotification(notificationType: NotificationType, message: string): void {
+  private sendNotification(notificationType: NotificationType, message: string): void {
     if (message) {
       this.notificationService.notify(notificationType, message);
     } else {

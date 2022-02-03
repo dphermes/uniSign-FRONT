@@ -22,7 +22,7 @@
             <label class="inline-flex items-center mt-2">
               <input type="checkbox" class="form-checkbox h-4 w-4 text-red-600"><span class="text-sm ml-2 text-gray-700">Remember Me</span>
             </label>
-            <span class="text-sm text-blue-600 hover:text-blue-300 cursor-pointer mt-2">Forgot password?</span>
+            <span (click)="forgotPasswordNotification()" class="text-sm text-blue-600 hover:text-blue-300 cursor-pointer mt-2">Forgot password?</span>
           </div>
           <div class="">
             <button type="submit" [disabled]="loginForm.invalid || showLoading" class="mt-4 mb-3 w-full bg-blue-500 hover:bg-blue-400 disabled:bg-blue-400 text-white py-2 rounded-md transition duration-100">
