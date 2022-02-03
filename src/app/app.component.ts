@@ -11,7 +11,7 @@ import {User} from "./model/user";
 export class AppComponent implements OnInit {
   dropdownOpen = false;
   notificationOpen = false;
-  sidebarOpen = false;
+  sidebarOpen = true;
   user = new User();
 
   constructor(public authService: AuthenticationService,
