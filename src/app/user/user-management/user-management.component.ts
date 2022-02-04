@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from "../../service/user.service";
 import {User} from "../../model/user";
-import {Subscription} from "rxjs";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../../service/authentication.service";
 import {NotificationService} from "../../service/notification.service";
@@ -10,6 +9,8 @@ import {HttpErrorResponse} from "@angular/common/http";
 import {NgForm} from "@angular/forms";
 import {CustomHttpResponse} from "../../model/custom-http-response";
 import {ModalService} from "../../service/modal.service";
+import {RoleService} from "../../service/role.service";
+import {SubSink} from "subsink";
 
 @Component({
   selector: 'app-user-management',
@@ -22,14 +23,16 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   editUser = new User();
   private currentUsername = '';
   showLoading = false;
-  private subscriptions: Subscription[] = [];
+  private subscriptions = new SubSink();
   profilePicture!: File;
 
   constructor(private router: Router,
               private userService: UserService,
               private authService: AuthenticationService,
+              public roleService: RoleService,
               private notificationService: NotificationService,
-              private modalService: ModalService) { }
+              private modalService: ModalService) {
+  }
 
   ngOnInit(): void {
     this.getUsers(false);
@@ -41,10 +44,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
    */
   public getUsers(showNotification: boolean) {
     this.showLoading = true;
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.userService.getUsers().subscribe(
         (response: User[]) => {
-          console.log(response);
           this.userService.addUsersToLocalStorage(response);
           this.users = response;
           this.showLoading = false;
@@ -65,14 +67,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
    * @param searchTerm string: fist name, last name, username, email or userId to search
    */
   public searchUsers(searchTerm: string): void {
-    console.log(searchTerm);
     const results: User[] = [];
     for (const user of this.userService.getUsersFromLocalStorage()) {
       // Put everything to lowercase because indexOf is case sensitive
       if (user.firstName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
-          user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
+        user.lastName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        user.username.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+        user.userId.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
         results.push(user);
       }
     }
@@ -102,7 +103,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   updateUser(): void {
     const formData = this.userService.createUserFormData(this.currentUsername, this.editUser, this.profilePicture);
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.userService.updateUser(formData).subscribe(
         (response: User) => {
           this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully!`);
@@ -123,7 +124,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   onAddNewUser(userForm: NgForm): void {
     // @ts-ignore
     const formData = this.userService.createUserFormData(null, userForm.value, this.profilePicture);
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.userService.addUser(formData).subscribe(
         (response: User) => {
           // @ts-ignore
@@ -146,7 +147,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
    */
   onDeleteUser(username: string): void {
     this.showLoading = true;
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.userService.deleteUser(username).subscribe(
         (response: CustomHttpResponse) => {
           this.onCloseModals();
@@ -171,7 +172,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.showLoading = true;
     const loggedInUser = this.authService.getUserFromLocalStorage();
     const loggedInUserEmail = loggedInUser.email;
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.userService.resetPassword(emailAddress).subscribe(
         (response: CustomHttpResponse) => {
           this.sendNotification(NotificationType.SUCCESS, response.message);
@@ -243,6 +244,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.unsubscribe();
   }
 }

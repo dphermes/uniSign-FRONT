@@ -2,13 +2,14 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {User} from "../../model/user";
 import {AuthenticationService} from "../../service/authentication.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {Subscription} from "rxjs";
 import {UserService} from "../../service/user.service";
 import {NotificationType} from "../../enum/notification-type.enum";
 import {HttpErrorResponse, HttpEvent, HttpEventType} from "@angular/common/http";
 import {NotificationService} from "../../service/notification.service";
 import {FileUploadStatus} from "../../model/file-upload.status";
 import {ModalService} from "../../service/modal.service";
+import {RoleService} from "../../service/role.service";
+import {SubSink} from "subsink";
 
 @Component({
   selector: 'app-user-profile',
@@ -22,18 +23,19 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   editUser = new User();
   private currentUsername = '';
   profilePicture!: File;
-  private subscriptions: Subscription[] = [];
+  private subscriptions = new SubSink();
   public fileStatus = new FileUploadStatus();
   usernameParam = '';
   isloggedInUser = false;
 
   constructor(private authService: AuthenticationService,
+              public roleService: RoleService,
               private userService: UserService,
               private notificationService: NotificationService,
               private modalService: ModalService,
               private route: ActivatedRoute,
               private router: Router) {
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.route.params.subscribe(
         params => this.usernameParam = params.username
       )
@@ -43,7 +45,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loggedInUser = this.authService.getUserFromLocalStorage();
     if (this.usernameParam) {
-      this.subscriptions.push(
+      this.subscriptions.add(
         this.userService.getUserByUsername(this.usernameParam).subscribe(
           (response: User) => {
             this.user = response
@@ -86,7 +88,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('username', this.user.username);
     formData.append('profileImage', this.profilePicture);
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.userService.updateProfileImage(formData).subscribe(
         (event: HttpEvent<any>) => {
           this.reportUploadProgress(event);
@@ -114,7 +116,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   updateUser(): void {
     // @ts-ignore
     const formData = this.userService.createUserFormData(this.currentUsername, this.editUser, this.profilePicture);
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.userService.updateUser(formData).subscribe(
         (response: User) => {
           this.onCloseModals();
@@ -206,7 +208,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.unsubscribe();
   }
 
 }

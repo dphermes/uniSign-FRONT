@@ -3,10 +3,11 @@ import {Router} from "@angular/router";
 import {AuthenticationService} from "../service/authentication.service";
 import {NotificationService} from "../service/notification.service";
 import {User} from "../model/user";
-import {Subscription} from "rxjs";
 import {HttpErrorResponse, HttpResponse} from "@angular/common/http";
 import {NotificationType} from "../enum/notification-type.enum";
 import {HeaderType} from "../enum/header-type.enum";
+import {SubSink} from "subsink";
+import {AppComponent} from "../app.component";
 
 @Component({
   selector: 'app-login',
@@ -16,10 +17,11 @@ import {HeaderType} from "../enum/header-type.enum";
 export class LoginComponent implements OnInit, OnDestroy {
 
   showLoading = false;
-  private subscriptions: Subscription[] = [];
+  private subscriptions = new SubSink();
 
   constructor(private router: Router,
               private authService: AuthenticationService,
+              public appComp: AppComponent,
               private notificationService: NotificationService) { }
 
   ngOnInit(): void {
@@ -36,7 +38,7 @@ export class LoginComponent implements OnInit, OnDestroy {
    */
   onLogin(user: User): void {
     this.showLoading = true;
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.authService.login(user).subscribe(
         (response: HttpResponse<User>) => {
           const token = response.headers.get(HeaderType.JWT_TOKEN);
@@ -44,6 +46,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.authService.saveToken(token);
           }
           if (response.body) {
+            this.appComp.changeUser(response.body);
             this.authService.addUserToLocalStorage(response.body)
           }
           this.router.navigateByUrl('/user/profile').then();
@@ -80,7 +83,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.unsubscribe();
   }
 
 }
