@@ -18,9 +18,9 @@
   </div>
   <div class="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <div *ngFor="let user of users" class="bg-[#20354b] rounded-2xl px-8 py-6 shadow-lg">
-      <div *ngIf="roleService.isAdminOrManager" class="relative flex items-center justify-between">
+      <div class="relative flex items-center justify-between">
         <span class="text-gray-400 text-sm">{{user?.lastLoginDateDisplay ? (user?.lastLoginDateDisplay | date: 'dd/MM/yyyy hh:mm') : 'Never logged in'}}</span>
-        <span class="text-emerald-400 cursor-pointer" (click)="onOpenModal('userDropDown' + user.userId)">
+        <span *ngIf="roleService.isAdminOrManager" class="text-emerald-400 cursor-pointer" (click)="onOpenModal('userDropDown' + user.userId)">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
           </svg>
@@ -33,7 +33,7 @@
              class="absolute right-0 top-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-20" style="display: none">
           <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white" href="user/profile/{{user?.username}}">Profile</a>
           <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white cursor-pointer" (click)="onOpenModal('userResetPasswordModal' + user.userId)">Reset password</a>
-          <a *ngIf="roleService.isAdmin" class="block px-4 py-2 text-sm text-red-500 hover:bg-[#20354b] cursor-pointer" (click)="onOpenModal('userDeleteModal' + user.userId)">Delete User</a>
+          <a *ngIf="(roleService.isAdmin && user.role != 'ROLE_SUPER_ADMIN') || (roleService.isSuperAdmin)" class="block px-4 py-2 text-sm text-red-500 hover:bg-[#20354b] cursor-pointer" (click)="onOpenModal('userDeleteModal' + user.userId)">Delete User</a>
         </div>
       </div>
       <div class="mt-6 w-fit mx-auto">

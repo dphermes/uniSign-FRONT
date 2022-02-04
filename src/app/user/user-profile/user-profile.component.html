@@ -340,31 +340,32 @@
               </div>
             </div>
 
-            <div *ngIf="roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
+            <div *ngIf="(roleService.isAdmin && editUser.role != 'ROLE_SUPER_ADMIN') || (roleService.isSuperAdmin)" class="grid grid-cols-1 mt-5 text-slate-500">
               <div class="inline-block">
                 <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Role</label>
                 <span *ngIf="editUserForm.invalid && roleInput.touched && !roleInput.value" class="text-sm text-red-600" id="roleError">Role required</span>
               </div>
               <select name="role"
                       id="role"
-                      value=""
                       #roleInput="ngModel"
+                      value="{{editUser.role}}"
+                      onclick="this.setAttribute('value', this.value);"
                       [(ngModel)]="editUser.role"
                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400">
                 <option value="ROLE_USER" selected>USER</option>
                 <option value="ROLE_MANAGER">MANAGER</option>
                 <option value="ROLE_ADMIN">ADMIN</option>
-                <option value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
+                <option value="ROLE_SUPER_ADMIN" *ngIf="roleService.isSuperAdmin">SUPER ADMIN</option>
               </select>
             </div>
-            <div *ngIf="!roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
+            <div *ngIf="!roleService.isAdmin || (roleService.isAdmin && editUser.role == 'ROLE_SUPER_ADMIN' && !roleService.isSuperAdmin)" class="grid grid-cols-1 mt-5 text-slate-500">
               <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Role</label>
               <input type="text"
                      name="role"
                      required
-                     ngModel="ROLE_USER" #roleInput="ngModel"
+                     #roleInput="ngModel"
                      readonly
-                     value="ROLE_USER"
+                     [(ngModel)]="editUser.role"
                      class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500">
             </div>
 
