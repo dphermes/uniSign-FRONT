@@ -1,11 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Subscription} from "rxjs";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../service/authentication.service";
 import {NotificationService} from "../service/notification.service";
 import {HttpErrorResponse} from "@angular/common/http";
 import {User} from "../model/user";
 import {NotificationType} from "../enum/notification-type.enum";
+import {SubSink} from "subsink";
 
 @Component({
   selector: 'app-register',
@@ -17,7 +17,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   showLoading = false;
   emailExists = false;
   usernameExists = false;
-  private subscriptions: Subscription[] = [];
+  private subscriptions = new SubSink();
 
   constructor(private router: Router,
               private authService: AuthenticationService,
@@ -37,7 +37,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.emailExists = false;
     this.usernameExists = false;
     this.showLoading = true;
-    this.subscriptions.push(
+    this.subscriptions.add(
       this.authService.register(user).subscribe(
         (response: User) => {
           this.showLoading = false;
@@ -73,7 +73,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.unsubscribe();
   }
 
 }
