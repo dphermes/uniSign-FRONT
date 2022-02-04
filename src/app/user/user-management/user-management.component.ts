@@ -47,7 +47,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.userService.getUsers().subscribe(
         (response: User[]) => {
-          console.log(response);
           this.userService.addUsersToLocalStorage(response);
           this.users = response;
           this.showLoading = false;
@@ -68,7 +67,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
    * @param searchTerm string: fist name, last name, username, email or userId to search
    */
   public searchUsers(searchTerm: string): void {
-    console.log(searchTerm);
     const results: User[] = [];
     for (const user of this.userService.getUsersFromLocalStorage()) {
       // Put everything to lowercase because indexOf is case sensitive
