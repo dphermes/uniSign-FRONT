@@ -10,6 +10,7 @@ import {FileUploadStatus} from "../../model/file-upload.status";
 import {ModalService} from "../../service/modal.service";
 import {RoleService} from "../../service/role.service";
 import {SubSink} from "subsink";
+import {AppComponent} from "../../app.component";
 
 @Component({
   selector: 'app-user-profile',
@@ -79,6 +80,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.profilePicture = event.target.files[0];
     // @ts-ignore
     output.src = URL.createObjectURL(this.profilePicture);
+    if (this.isloggedInUser) {
+      const outputAppComp = document.getElementById('menuProfilePicture');
+      // @ts-ignore
+      outputAppComp.src = URL.createObjectURL(this.profilePicture);
+    }
   }
 
   /**
@@ -146,7 +152,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       case HttpEventType.Response:
         if (event.status === 200) {
           this.user.profileImageUrl = `${event.body.profileImageUrl}?time=${new Date().getTime()}`;
-          this.authService.addUserToLocalStorage(event.body);
+          if (this.isloggedInUser) {
+            this.authService.addUserToLocalStorage(event.body);
+          }
           this.sendNotification(NotificationType.SUCCESS, `${event.body.firstName}'s profile picture updated successfully!`);
           this.fileStatus.status = 'complete';
           break;

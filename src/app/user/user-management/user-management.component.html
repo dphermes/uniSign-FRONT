@@ -39,7 +39,7 @@
       <div class="mt-6 w-fit mx-auto">
         <a href="/user/profile/{{user.username}}">
           <div class="cursor-pointer rounded-full overflow-hidden border-2 w-28 h-28">
-            <img src="{{user?.profileImageUrl}}" class="h-full w-full object-cover" alt="{{user?.username}} profile picture" srcset="">
+            <img id="manageUserProfilePicture{{user.userId}}" src="{{user?.profileImageUrl}}" class="h-full w-full object-cover" alt="{{user?.username}} profile picture" srcset="">
           </div>
         </a>
       </div>
