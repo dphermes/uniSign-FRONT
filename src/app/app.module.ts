@@ -15,6 +15,7 @@ import {FormsModule} from "@angular/forms";
 import {UserManagementComponent} from './user/user-management/user-management.component';
 import { RegisterComponent } from './register/register.component';
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
+import { SignatureManagementComponent } from './signature/signature-management/signature-management.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { UserProfileComponent } from './user/user-profile/user-profile.component
     LoginComponent,
     UserManagementComponent,
     RegisterComponent,
-    UserProfileComponent
+    UserProfileComponent,
+    SignatureManagementComponent
   ],
   imports: [
     BrowserModule,
