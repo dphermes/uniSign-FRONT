@@ -16,7 +16,7 @@ export class ModalService {
   openModal(modalName: string): void {
     this.closeModals();
     this.openedModals.push(modalName);
-    if (modalName.includes('userDropDown')) {
+    if (modalName.includes('userDropDown') || modalName.includes('signatureDropDown')) {
       // @ts-ignore
       document.getElementById('modalOverlay').style.display='block';
       this.openedModals.push('modalOverlay');
