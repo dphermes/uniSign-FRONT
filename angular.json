@@ -31,9 +31,12 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "./node_modules/grapesjs/dist/css/grapes.min.css"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/grapesjs/dist/grapes.min.js"
+            ]
           },
           "configurations": {
             "production": {

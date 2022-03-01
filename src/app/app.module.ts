@@ -16,6 +16,7 @@ import {UserManagementComponent} from './user/user-management/user-management.co
 import { RegisterComponent } from './register/register.component';
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
 import { SignatureManagementComponent } from './signature/signature-management/signature-management.component';
+import { SignatureBuilderComponent } from './signature/signature-builder/signature-builder.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { SignatureManagementComponent } from './signature/signature-management/s
     UserManagementComponent,
     RegisterComponent,
     UserProfileComponent,
-    SignatureManagementComponent
+    SignatureManagementComponent,
+    SignatureBuilderComponent
   ],
   imports: [
     BrowserModule,

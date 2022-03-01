@@ -7,3 +7,37 @@
 @tailwind components;
 @tailwind utilities;
 @import "angular-notifier/styles";
+
+.gjs-cv-canvas {
+  top: 0;
+  width: 100%!important;
+  height: 100%;
+}
+
+.gjs-rte-action svg {
+  height: 24px;
+  width: 24px;
+}
+
+
+.btn-save-data {
+  padding: 3px 20px!important;
+  background: #58c9ec!important;
+}
+.btn-save-data:hover {
+  background: #3c8da1!important;
+}
+.btn-save-data .small {
+  font-size: 0.8em;
+}
+
+/* Colors */
+.gjs-three-color,
+.gjs-three-color-h:hover {
+  color: #3c8da1!important;
+}
+
+.gjs-four-color,
+.gjs-four-color-h:hover {
+  color: #58c9ec!important;
+}

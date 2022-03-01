@@ -6,6 +6,7 @@ import {RegisterComponent} from "./register/register.component";
 import {AuthGuard} from "./guard/auth.guard";
 import {UserProfileComponent} from "./user/user-profile/user-profile.component";
 import {SignatureManagementComponent} from "./signature/signature-management/signature-management.component";
+import {SignatureBuilderComponent} from "./signature/signature-builder/signature-builder.component";
 
 const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path: 'user/profile/:username', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'user/profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'signatures/management', component: SignatureManagementComponent, canActivate: [AuthGuard]},
+  {path: 'signatures/builder', component: SignatureBuilderComponent, canActivate: [AuthGuard]},
   {path: '', redirectTo: '/login', pathMatch: 'full'}
 ];
 
