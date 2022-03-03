@@ -8,6 +8,11 @@ import grapesjsPresetNewsletter from "grapesjs-preset-newsletter";
 import fr from 'grapesjs/locale/fr';
 import {SignatureService} from "../../service/signature.service";
 import {Signature} from "../../model/signature";
+import {ActivatedRoute, Params} from "@angular/router";
+import {SubSink} from "subsink";
+import {NotificationService} from "../../service/notification.service";
+import {HttpErrorResponse} from "@angular/common/http";
+import {NotificationType} from "../../enum/notification-type.enum";
 
 @Component({
   selector: 'app-signature-builder',
@@ -16,26 +21,70 @@ import {Signature} from "../../model/signature";
 })
 export class SignatureBuilderComponent implements OnInit {
 
+  private editSignature = new Signature();
+  private currentSignatureId = '';
   editor: any;
   loadedHtml = '';
+  private subscriptions = new SubSink();
 
-  constructor(private signatureService: SignatureService) {
+  constructor(private route: ActivatedRoute,
+              private signatureService: SignatureService,
+              private notificationService: NotificationService) {
   }
 
   ngOnInit(): void {
-    this.signatureService.getSignatureById(1).subscribe(
-      (response: Signature) => {
-        this.loadedHtml = response.htmlSignature;
-        this.uniSignBuilderInit();
-      }
+    this.subscriptions.add(
+      this.route.params.subscribe(
+        (response: Params) => {
+          this.currentSignatureId = response['signatureId'];
+        }
+      ),
+      this.signatureService.getSignatureById(this.currentSignatureId).subscribe(
+        (response: Signature) => {
+          this.editSignature = response;
+          this.loadedHtml = response.htmlSignature;
+          this.uniSignBuilderInit();
+        }
+      )
+    );
+  }
+
+  public saveInlineHtml() {
+    this.editSignature.htmlSignature = this.editor.runCommand('gjs-get-inlined-html');
+    const formData = this.signatureService.createSignatureFormData(this.editSignature.label, this.editSignature);
+    this.subscriptions.add(
+      this.signatureService.updateSignature(formData).subscribe(
+        (response: Signature) => {
+          this.sendNotification(NotificationType.SUCCESS, `${response.label} updated with success`);
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        }
+      )
     )
   }
 
-  private saveInlineHtml(htmlToSave: string) {
-    console.log(htmlToSave);
+  /**
+   * Calls Notification Service to notify in this component
+   * @param notificationType NotificationType: notification type (e.g: ERROR, SUCCESS...)
+   * @param message string: Message to show in the notification
+   * @private
+   */
+  private sendNotification(notificationType: NotificationType, message: string): void {
+    if (message) {
+      this.notificationService.notify(notificationType, message);
+    } else {
+      this.notificationService.notify(notificationType, 'An error occurred. Please try again.');
+    }
   }
 
   private uniSignBuilderInit() {
+    const LandingPage = {
+      html: this.loadedHtml,
+      css: null,
+      components: null,
+      style: null,
+    };
     this.editor = grapesjs.init({
       // Indicate where to init the editor. You can also pass an HTMLElement
       container: '#gjs',
@@ -52,10 +101,10 @@ export class SignatureBuilderComponent implements OnInit {
           // ... other options
         }
       },
-      components: this.loadedHtml,
       // Get the content for the canvas directly from the element
       // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
-      fromElement: true,
+      components: LandingPage.html,
+      fromElement: false,
       // Size of the editor
       height: '100%',
       width: 'auto',
@@ -68,7 +117,7 @@ export class SignatureBuilderComponent implements OnInit {
         storeHtml: true,
         storeCss: true,
         urlStore: 'http://endpoint/store-template/some-id-123',
-        urlLoad: 'http://localhost:8081/api/v1/signature/find/1',
+        urlLoad: 'http://localhost:8081/api/v1/signature/find/' + this.currentSignatureId,
         // For custom parameters/headers on requests
         params: { _some_token: '....' },
         headers: { Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJTaWduYXR1cmUgbWFuYWdlbWVudCBwb3J0YWwiLCJzdWIiOiJkUHVhdWQiLCJpc3MiOiJLb25pY2EgTWlub2x0YSBDZW50cmUgTG9pcmUsIFNBUyIsIkF1dGhvcml0aWVzIjpbInVzZXI6cmVhZCIsInVzZXI6dXBkYXRlIiwidXNlcjpjcmVhdGUiLCJ1c2VyOmRlbGV0ZSJdLCJleHAiOjE2NDY0Njc4NDMsImlhdCI6MTY0NjAzNTg0M30.y6KLIih-Ap51K7HCD9KnzA9UnWQib1Z4R5M5lwtUvfYxQ0PHfw1I2oYTz6GIfRWI1uNgbRRUF4jFzaNJ3mtZUQ' },
@@ -98,19 +147,6 @@ export class SignatureBuilderComponent implements OnInit {
       // Avoid any default panel
       panels: {
         defaults: [
-          {
-            id: 'basic-custom-options',
-            el: '.panel__basic-custom-options',
-            buttons: [
-              {
-                id: 'save',
-                className: 'btn-save-data',
-                label: '<i class="fa fa-save"></i> <span class="small">SAVE</span>',
-                command: 'save-data',
-                context: 'save-data', // For grouping context of buttons from the same panel
-              }
-            ]
-          },
           {
             id: 'layers',
             el: '.panel__right',
@@ -269,7 +305,6 @@ export class SignatureBuilderComponent implements OnInit {
         ]
       },
     });
-
     /**
      * Add Basic Options to Top Panel
      */
@@ -294,19 +329,6 @@ export class SignatureBuilderComponent implements OnInit {
           label: '<i class="fa fa-code"></i>',
           command: 'export-template',
           context: 'export-template', // For grouping context of buttons from the same panel
-        },
-        {
-          id: 'show-json',
-          className: 'btn-show-json',
-          label: 'JSON',
-          context: 'show-json',
-          command(editor: any) {
-            editor.Modal.setTitle('Components JSON')
-              .setContent(`<textarea style="width:100%; height: 250px;">
-            ${JSON.stringify(editor.getComponents())}
-          </textarea>`)
-              .open();
-          },
         }
       ],
     });
@@ -325,12 +347,6 @@ export class SignatureBuilderComponent implements OnInit {
       attributes: { title: 'Redo' }
     });
     // Define commands
-    this.editor.Commands.add('save-data', {
-      run(editor: any) {
-        const inlineHtml: string = editor.runCommand('gjs-get-inlined-html');
-        console.log(inlineHtml);
-      }
-    });
     this.editor.Commands.add('set-device-desktop', {
       run: (editor: { setDevice: (arg0: string) => any; }) => editor.setDevice('Desktop')
     });
@@ -348,11 +364,11 @@ export class SignatureBuilderComponent implements OnInit {
         return row.querySelector('.blocks-container')
       },
 
-      run(editor: any, sender: any) {
+      run(editor: any) {
         const bmEl = this.getStyleEl(this.getRowEl(editor));
         bmEl.style.display = '';
       },
-      stop(editor: any, sender: any) {
+      stop(editor: any) {
         const smEl = this.getStyleEl(this.getRowEl(editor));
         smEl.style.display = 'none';
       },
@@ -365,11 +381,11 @@ export class SignatureBuilderComponent implements OnInit {
         return row.querySelector('.traits-container')
       },
 
-      run(editor: any, sender: any) {
+      run(editor: any) {
         const lmEl = this.getLayersEl(this.getRowEl(editor));
         lmEl.style.display = '';
       },
-      stop(editor: any, sender: any) {
+      stop(editor: any) {
         const lmEl = this.getLayersEl(this.getRowEl(editor));
         lmEl.style.display = 'none';
       },
@@ -382,11 +398,11 @@ export class SignatureBuilderComponent implements OnInit {
         return row.querySelector('.layers-container')
       },
 
-      run(editor: any, sender: any) {
+      run(editor: any) {
         const lmEl = this.getLayersEl(this.getRowEl(editor));
         lmEl.style.display = '';
       },
-      stop(editor: any, sender: any) {
+      stop(editor: any) {
         const lmEl = this.getLayersEl(this.getRowEl(editor));
         lmEl.style.display = 'none';
       },
@@ -399,11 +415,11 @@ export class SignatureBuilderComponent implements OnInit {
         return row.querySelector('.styles-container')
       },
 
-      run(editor: any, sender: any) {
+      run(editor: any) {
         const smEl = this.getStyleEl(this.getRowEl(editor));
         smEl.style.display = '';
       },
-      stop(editor: any, sender: any) {
+      stop(editor: any) {
         const smEl = this.getStyleEl(this.getRowEl(editor));
         smEl.style.display = 'none';
       },

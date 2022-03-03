@@ -7,6 +7,8 @@ import {NotificationType} from "../../enum/notification-type.enum";
 import {NotificationService} from "../../service/notification.service";
 import {RoleService} from "../../service/role.service";
 import {ModalService} from "../../service/modal.service";
+import {NgForm} from "@angular/forms";
+import {CustomHttpResponse} from "../../model/custom-http-response";
 
 @Component({
   selector: 'app-signature-management',
@@ -16,6 +18,8 @@ import {ModalService} from "../../service/modal.service";
 export class SignatureManagementComponent implements OnInit, OnDestroy {
 
   public signatures: Signature[] = [];
+  editSignature = new Signature();
+  private currentSignatureLabel = '';
   showLoading = false;
   private subscriptions = new SubSink();
 
@@ -44,6 +48,59 @@ export class SignatureManagementComponent implements OnInit, OnDestroy {
 
       )
     );
+  }
+
+  onAddNewSignature(addSignatureForm: NgForm) {
+    return addSignatureForm;
+  }
+
+  onUpdateSignature() {
+    const formData = this.signatureService.createSignatureFormData(this.currentSignatureLabel, this.editSignature);
+    this.subscriptions.add(
+      this.signatureService.updateSignature(formData).subscribe(
+      (response: Signature) => {
+          this.onCloseModals();
+          this.sendNotification(NotificationType.SUCCESS, `${response.label} updated successfully`);
+        },
+        (error: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, error.error.message);
+        }
+      )
+    )
+  }
+
+  onDeleteSignature(signatureId: string) {
+    this.showLoading = true;
+    this.subscriptions.add(
+      this.signatureService.deleteSignature(signatureId).subscribe(
+        (response: CustomHttpResponse) => {
+          this.onCloseModals();
+          this.sendNotification(NotificationType.SUCCESS, response.message);
+          this.showLoading = false;
+          this.getSignatures();
+        },
+        (error: HttpErrorResponse) => {
+          this.showLoading = false;
+          this.sendNotification(NotificationType.ERROR, error.error.message);
+        }
+      )
+    );
+  }
+
+  onEditSignature(signature: Signature) {
+    this.editSignature = signature;
+    this.currentSignatureLabel = signature.label;
+    SignatureManagementComponent.clickButton('openEditModal');
+  }
+
+  /**
+   * Aims the button in hidden profile image form to click it programmatically
+   * @param buttonId string: button id
+   * @private
+   */
+  private static clickButton(buttonId: string): void {
+    // @ts-ignore
+    document.getElementById(buttonId).click();
   }
 
   /**
@@ -78,5 +135,4 @@ export class SignatureManagementComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
 }

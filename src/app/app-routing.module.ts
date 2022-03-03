@@ -15,7 +15,7 @@ const routes: Routes = [
   {path: 'user/profile/:username', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'user/profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'signatures/management', component: SignatureManagementComponent, canActivate: [AuthGuard]},
-  {path: 'signatures/builder', component: SignatureBuilderComponent, canActivate: [AuthGuard]},
+  {path: 'signatures/builder/:signatureId', component: SignatureBuilderComponent, canActivate: [AuthGuard]},
   {path: '', redirectTo: '/login', pathMatch: 'full'}
 ];
 

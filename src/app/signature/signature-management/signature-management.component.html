@@ -1,4 +1,15 @@
 <section class="p-4">
+  <div class="w-full bg-white rounded-xl flex flex-row-reverse p-2 mb-4 gap-4">
+    <button (click)="getSignatures()" class="bg-cyan-900 text-white rounded px-4 py-2">
+      <i class="fas fa-sync-alt" *ngIf="!showLoading"></i>
+      <i class="fas fa-sync-alt fa-spin" *ngIf="showLoading"></i>
+    </button>
+    <button [hidden]="true" class="hidden" id="openEditModal" (click)="onOpenModal('signatureEditModal')"></button>
+    <button *ngIf="roleService.isAdminOrManager" (click)="onOpenModal('signatureAddModal')" class="bg-pink-600 text-white hover:bg-pink-700 rounded-full px-4 py-2">
+      <i class="fas fa-plus"></i> Add Signature
+    </button>
+  </div>
+
   <div class="grid grid-cols-3 gap-2">
     <!-- Signature card -->
     <div *ngFor="let signature of signatures" class="flex flex-wrap justify-center">
@@ -23,7 +34,8 @@
 
             <div id="signatureDropDown{{signature?.signatureId}}"
                  class="absolute right-0 top-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-20" style="display: none">
-              <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white" href="user/profile/{{signature?.signatureId}}">Edit</a>
+              <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white" href="signatures/builder/{{signature?.signatureId}}">Edit</a>
+              <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white" (click)="onEditSignature(signature)">Settings</a>
               <a *ngIf="(roleService.isAdmin) || (roleService.isSuperAdmin)" class="block px-4 py-2 text-sm text-red-500 hover:bg-[#20354b] cursor-pointer" (click)="onOpenModal('userDeleteModal' + signature?.signatureId)">Delete Signature</a>
             </div>
           </div>
@@ -47,6 +59,187 @@
           </div>
         </div>
       </div>
+
+      <!-- Add Signature Modal -->
+      <div *ngIf="roleService.isAdminOrManager" id="signatureAddModal" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+        <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100">
+          <div
+            class="relative bg-white shadow-lg rounded-lg text-gray-900 z-30">
+            <header class="flex flex-col justify-center items-center p-3 text-emerald-500">
+              <div class="flex justify-center w-28 h-28 border-4 border-emerald-500 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                </svg>
+              </div>
+              <h2 class="font-semibold text-2xl">Add new signature</h2>
+            </header>
+            <main>
+              <form #addSignatureForm="ngForm" (ngSubmit)="onAddNewSignature(addSignatureForm)">
+                <div class="p-4">
+
+                  <div class="grid grid-cols-15 mt-5">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Label</label>
+                      <span *ngIf="addSignatureForm.invalid && labelInput.touched && !labelInput.value" class="text-sm text-red-600" id="usernameError">Label required</span>
+                    </div>
+                    <input type="text"
+                           id="label"
+                           name="label"
+                           placeholder=" "
+                           ngModel #labelInput="ngModel"
+                           required
+                           class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addSignatureForm.invalid && labelInput.touched && !labelInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                  </div>
+
+                  <div class="grid grid-cols-1 mt-5 text-slate-500">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Group</label>
+                      <span *ngIf="addSignatureForm.invalid && groupInput.touched && !groupInput.value" class="text-sm text-red-600" id="roleError">Group required</span>
+                    </div>
+                    <select name="group"
+                            id="group"
+                            value=""
+                            ngModel #groupInput="ngModel"
+                            onclick="this.setAttribute('value', this.value);"
+                            class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 {{addSignatureForm.invalid && groupInput.touched && !groupInput.value ? 'border-red-500' : 'border-blue-300'}}">
+                      <option value="BOURGES" selected>BOURGES</option>
+                      <option value="NANTES">NANTES</option>
+                      <option value="ANGERS">ANGERS</option>
+                    </select>
+                  </div>
+
+                  <div class="flex flex-row space-x-4 text-center mt-2">
+                    <div class="relative z-30 w-full mb-2">
+                      <label class="inline-flex items-center mt-2">
+                        <input
+                          type="checkbox"
+                          name="active"
+                          id="active"
+                          checked
+                          [ngModel]="false"
+                          ngModel #activeInput="ngModel"
+                          class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Active</span>
+                      </label>
+                    </div>
+                    <div class="relative z-30 w-full">
+                      <label class="inline-flex items-center mt-2">
+                        <input
+                          type="checkbox"
+                          name="notLocked"
+                          id="notLocked"
+                          checked
+                          [ngModel]="true"
+                          ngModel #notLockedInput="ngModel"
+                          class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Unlocked</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <footer class="flex justify-center bg-transparent mt-6">
+                  <button (click)="onCloseModals()" type="button"
+                          class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    Cancel
+                  </button>
+                  <button type="submit"
+                          [disabled]="addSignatureForm.invalid"
+                          class="bg-emerald-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-emerald-600 disabled:bg-emerald-300 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    Confirm
+                  </button>
+                </footer>
+              </form>
+            </main>
+          </div>
+        </div>
+      </div>
+      <!-- END Add Signature Modal -->
+
+      <!-- Edit Signature Settings Modal -->
+      <div *ngIf="roleService.isAdminOrManager" id="signatureEditModal" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+        <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100">
+          <div
+            class="relative bg-white shadow-lg rounded-lg text-gray-900 z-30">
+            <header class="flex flex-col justify-center items-center p-3 text-emerald-500">
+              <div class="flex justify-center w-28 h-28 border-4 border-emerald-500 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <h2 class="font-semibold text-2xl">Edit {{signature.label}}</h2>
+            </header>
+            <main>
+              <form #editSignatureForm="ngForm" (ngSubmit)="onUpdateSignature()">
+                <div class="p-4">
+
+                  <div class="grid grid-cols-15 mt-5">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Label</label>
+                      <span *ngIf="editSignatureForm.invalid && labelUpdateInput.touched && !labelUpdateInput.value" class="text-sm text-red-600" id="labelUpdateError">Label required</span>
+                    </div>
+                    <input type="text"
+                           id="labelUpdate"
+                           name="labelUpdate"
+                           placeholder=" "
+                           ngModel #labelUpdateInput="ngModel"
+                           [(ngModel)]="editSignature.label"
+                           required
+                           class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editSignatureForm.invalid && labelUpdateInput.touched && !labelUpdateInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                  </div>
+                </div>
+
+                <footer class="flex justify-center bg-transparent mt-6">
+                  <button (click)="onCloseModals()" type="button"
+                          class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    Cancel
+                  </button>
+                  <button type="submit"
+                          [disabled]="editSignatureForm.invalid"
+                          class="bg-emerald-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-emerald-600 disabled:bg-emerald-300 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    Confirm
+                  </button>
+                </footer>
+              </form>
+            </main>
+          </div>
+        </div>
+      </div>
+      <!-- END Edit Signature Settings Modal -->
+
+      <!-- Delete Signature Modal -->
+      <div *ngIf="roleService.isAdmin" id="userDeleteModal{{signature.signatureId}}" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+        <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100 z-30">
+          <div
+            class="relative bg-white shadow-lg rounded-lg text-slate-600 z-30">
+            <header class="flex flex-col justify-center items-center p-3 text-red-500">
+              <div class="flex justify-center w-28 h-28 border-4 border-red-500 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <h2 class="font-semibold text-2xl">Delete {{signature.label}}</h2>
+            </header>
+            <main class="p-3 text-center">
+              <p>
+                Are you sure you want to delete <span class="font-semibold">{{signature.label}}</span> from signatures ?
+              </p>
+              <p class="text-red-500 font-semibold">This action is irreversible</p>
+            </main>
+            <footer class="flex justify-center bg-transparent mt-6">
+              <button (click)="onCloseModals()" type="button"
+                      class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                Cancel
+              </button>
+              <button (click)="onDeleteSignature(signature.signatureId)"
+                      class="bg-red-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                Confirm
+              </button>
+            </footer>
+          </div>
+        </div>
+      </div>
+      <!-- END Delete Signature Modal -->
+
     </div>
     <!-- END Signature card -->
 
