@@ -6,6 +6,8 @@ import grapesjs from "grapesjs";
 import grapesjsPresetNewsletter from "grapesjs-preset-newsletter";
 // @ts-ignore
 import fr from 'grapesjs/locale/fr';
+import {SignatureService} from "../../service/signature.service";
+import {Signature} from "../../model/signature";
 
 @Component({
   selector: 'app-signature-builder',
@@ -17,12 +19,16 @@ export class SignatureBuilderComponent implements OnInit {
   editor: any;
   loadedHtml = '';
 
-  constructor() {
+  constructor(private signatureService: SignatureService) {
   }
 
   ngOnInit(): void {
-    this.loadedHtml = '<h1>sdlfgjldfkjg</h1>';
-    this.uniSignBuilderInit();
+    this.signatureService.getSignatureById(1).subscribe(
+      (response: Signature) => {
+        this.loadedHtml = response.htmlSignature;
+        this.uniSignBuilderInit();
+      }
+    )
   }
 
   private saveInlineHtml(htmlToSave: string) {
@@ -39,25 +45,34 @@ export class SignatureBuilderComponent implements OnInit {
         // localeFallback: 'en', // default fallback
         messages: { fr },
       },
-      components: this.loadedHtml,
       plugins: [grapesjsPresetNewsletter],
       pluginsOpts: {
         'gjs-preset-newsletter': {
           modalTitleImport: 'Import template',
           // ... other options
-        },
-        "gjs-blocks-basic": {
-          /* ...options */
         }
       },
+      components: this.loadedHtml,
       // Get the content for the canvas directly from the element
       // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
       fromElement: true,
       // Size of the editor
       height: '100%',
       width: 'auto',
-      // Disable the storage manager for the moment
-      storageManager: false,
+      storageManager: {
+        type: 'remote',
+        stepsBeforeSave: 6,
+        contentTypeJson: true,
+        storeComponents: true,
+        storeStyles: true,
+        storeHtml: true,
+        storeCss: true,
+        urlStore: 'http://endpoint/store-template/some-id-123',
+        urlLoad: 'http://localhost:8081/api/v1/signature/find/1',
+        // For custom parameters/headers on requests
+        params: { _some_token: '....' },
+        headers: { Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJTaWduYXR1cmUgbWFuYWdlbWVudCBwb3J0YWwiLCJzdWIiOiJkUHVhdWQiLCJpc3MiOiJLb25pY2EgTWlub2x0YSBDZW50cmUgTG9pcmUsIFNBUyIsIkF1dGhvcml0aWVzIjpbInVzZXI6cmVhZCIsInVzZXI6dXBkYXRlIiwidXNlcjpjcmVhdGUiLCJ1c2VyOmRlbGV0ZSJdLCJleHAiOjE2NDY0Njc4NDMsImlhdCI6MTY0NjAzNTg0M30.y6KLIih-Ap51K7HCD9KnzA9UnWQib1Z4R5M5lwtUvfYxQ0PHfw1I2oYTz6GIfRWI1uNgbRRUF4jFzaNJ3mtZUQ' },
+      },
       layerManager: {
         appendTo: '.layers-container'
       },
@@ -125,6 +140,13 @@ export class SignatureBuilderComponent implements OnInit {
                 togglable: false,
               },
               {
+                id: 'show-traits',
+                active: true,
+                label: '<i class="fa fa-cog"></i>',
+                command: 'show-traits',
+                togglable: false,
+              },
+              {
                 id: 'show-layers',
                 active: true,
                 label: '<i class="fa fa-layer-group"></i>',
@@ -168,6 +190,9 @@ export class SignatureBuilderComponent implements OnInit {
             ],
           }
         ]
+      },
+      traitManager: {
+        appendTo: '.traits-container',
       },
       selectorManager: {
         appendTo: '.styles-container'
@@ -285,6 +310,20 @@ export class SignatureBuilderComponent implements OnInit {
         }
       ],
     });
+    // Add Buttons
+    // Add undo/redo buttons
+    this.editor.Panels.addButton('options', {
+      id: 'undo',
+      className: 'fa fa-undo',
+      command: 'undo',
+      attributes: { title: 'Undo' }
+    });
+    this.editor.Panels.addButton('options', {
+      id: 'redo',
+      className: 'fa fa-repeat',
+      command: 'redo',
+      attributes: { title: 'Redo' }
+    });
     // Define commands
     this.editor.Commands.add('save-data', {
       run(editor: any) {
@@ -316,6 +355,23 @@ export class SignatureBuilderComponent implements OnInit {
       stop(editor: any, sender: any) {
         const smEl = this.getStyleEl(this.getRowEl(editor));
         smEl.style.display = 'none';
+      },
+    });
+    this.editor.Commands.add('show-traits', {
+      getRowEl(editor: any) {
+        return editor.getContainer().closest('.editor-row');
+      },
+      getLayersEl(row: any) {
+        return row.querySelector('.traits-container')
+      },
+
+      run(editor: any, sender: any) {
+        const lmEl = this.getLayersEl(this.getRowEl(editor));
+        lmEl.style.display = '';
+      },
+      stop(editor: any, sender: any) {
+        const lmEl = this.getLayersEl(this.getRowEl(editor));
+        lmEl.style.display = 'none';
       },
     });
     this.editor.Commands.add('show-layers', {
@@ -352,5 +408,7 @@ export class SignatureBuilderComponent implements OnInit {
         smEl.style.display = 'none';
       },
     });
+    // Custom Components style
+
   }
 }

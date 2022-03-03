@@ -16,4 +16,8 @@ export class SignatureService {
   public getSignatures(): Observable<Signature[]> {
     return this.http.get<Signature[]>(`${this.host}/signature/all`);
   }
+
+  public getSignatureById(signatureId: number): Observable<Signature> {
+    return this.http.get<Signature>(`${this.host}/signature/find/${signatureId}`);
+  }
 }
