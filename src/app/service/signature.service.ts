@@ -4,6 +4,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Signature} from "../model/signature";
 import {CustomHttpResponse} from "../model/custom-http-response";
+import {User} from "../model/user";
 
 @Injectable({
   providedIn: 'root'
@@ -30,17 +31,22 @@ export class SignatureService {
     return this.http.get<Signature>(`${this.host}/signature/find/${signatureId}`);
   }
 
+  public addSignature(formData: FormData): Observable<Signature> {
+    return this.http.post<Signature>(`${this.host}/signature/add`, formData);
+  }
+
   public updateSignature(formData: FormData): Observable<Signature> {
-    return this.http.post<Signature>(`${this.host}/signature/update/`, formData);
+    return this.http.post<Signature>(`${this.host}/signature/update`, formData);
   }
 
   deleteSignature(signatureId: string): Observable<CustomHttpResponse> {
     return this.http.delete<CustomHttpResponse>(`${this.host}/signature/delete/${signatureId}`);
   }
 
-  public createSignatureFormData(currentLabel: string, signature: Signature): FormData {
+  public createSignatureFormData(currentLabel: string, userName: string, signature: Signature): FormData {
     const formData = new FormData();
     formData.append('currentLabel', currentLabel);
+    formData.append('userName', userName);
     formData.append('label', signature.label);
     formData.append('isActive', JSON.stringify(signature.active));
     formData.append('htmlSignature', signature.htmlSignature);

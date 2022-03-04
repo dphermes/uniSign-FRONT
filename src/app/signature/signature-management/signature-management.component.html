@@ -92,23 +92,6 @@
                            class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addSignatureForm.invalid && labelInput.touched && !labelInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
                   </div>
 
-                  <div class="grid grid-cols-1 mt-5 text-slate-500">
-                    <div class="inline-block">
-                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Group</label>
-                      <span *ngIf="addSignatureForm.invalid && groupInput.touched && !groupInput.value" class="text-sm text-red-600" id="roleError">Group required</span>
-                    </div>
-                    <select name="group"
-                            id="group"
-                            value=""
-                            ngModel #groupInput="ngModel"
-                            onclick="this.setAttribute('value', this.value);"
-                            class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 {{addSignatureForm.invalid && groupInput.touched && !groupInput.value ? 'border-red-500' : 'border-blue-300'}}">
-                      <option value="BOURGES" selected>BOURGES</option>
-                      <option value="NANTES">NANTES</option>
-                      <option value="ANGERS">ANGERS</option>
-                    </select>
-                  </div>
-
                   <div class="flex flex-row space-x-4 text-center mt-2">
                     <div class="relative z-30 w-full mb-2">
                       <label class="inline-flex items-center mt-2">
@@ -120,18 +103,6 @@
                           [ngModel]="false"
                           ngModel #activeInput="ngModel"
                           class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Active</span>
-                      </label>
-                    </div>
-                    <div class="relative z-30 w-full">
-                      <label class="inline-flex items-center mt-2">
-                        <input
-                          type="checkbox"
-                          name="notLocked"
-                          id="notLocked"
-                          checked
-                          [ngModel]="true"
-                          ngModel #notLockedInput="ngModel"
-                          class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Unlocked</span>
                       </label>
                     </div>
                   </div>

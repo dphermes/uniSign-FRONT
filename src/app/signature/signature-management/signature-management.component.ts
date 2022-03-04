@@ -9,6 +9,8 @@ import {RoleService} from "../../service/role.service";
 import {ModalService} from "../../service/modal.service";
 import {NgForm} from "@angular/forms";
 import {CustomHttpResponse} from "../../model/custom-http-response";
+import {AuthenticationService} from "../../service/authentication.service";
+import {User} from "../../model/user";
 
 @Component({
   selector: 'app-signature-management',
@@ -20,16 +22,23 @@ export class SignatureManagementComponent implements OnInit, OnDestroy {
   public signatures: Signature[] = [];
   editSignature = new Signature();
   private currentSignatureLabel = '';
+  loggedInUser = new User();
   showLoading = false;
   private subscriptions = new SubSink();
 
   constructor(private signatureService: SignatureService,
               public roleService: RoleService,
+              public authService: AuthenticationService,
               private notificationService: NotificationService,
               private modalService: ModalService) { }
 
   ngOnInit(): void {
+    this.getLoggedInUser();
     this.getSignatures();
+  }
+
+  private getLoggedInUser() {
+      this.loggedInUser = this.authService.getUserFromLocalStorage();
   }
 
   public getSignatures() {
@@ -51,11 +60,24 @@ export class SignatureManagementComponent implements OnInit, OnDestroy {
   }
 
   onAddNewSignature(addSignatureForm: NgForm) {
-    return addSignatureForm;
+    // @ts-ignore
+    const formData = this.signatureService.createSignatureFormData(null, this.loggedInUser.username, addSignatureForm.value);
+    this.subscriptions.add(
+      this.signatureService.addSignature(formData).subscribe(
+        (response: Signature) => {
+          this.onCloseModals();
+          this.sendNotification(NotificationType.SUCCESS, `${response.label} added successfully`);
+          this.getSignatures();
+        },
+        (error: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, error.error.message);
+        }
+      )
+    )
   }
 
   onUpdateSignature() {
-    const formData = this.signatureService.createSignatureFormData(this.currentSignatureLabel, this.editSignature);
+    const formData = this.signatureService.createSignatureFormData(this.currentSignatureLabel, this.loggedInUser.username, this.editSignature);
     this.subscriptions.add(
       this.signatureService.updateSignature(formData).subscribe(
       (response: Signature) => {

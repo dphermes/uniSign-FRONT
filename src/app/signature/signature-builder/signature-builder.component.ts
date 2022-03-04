@@ -13,6 +13,8 @@ import {SubSink} from "subsink";
 import {NotificationService} from "../../service/notification.service";
 import {HttpErrorResponse} from "@angular/common/http";
 import {NotificationType} from "../../enum/notification-type.enum";
+import {User} from "../../model/user";
+import {AuthenticationService} from "../../service/authentication.service";
 
 @Component({
   selector: 'app-signature-builder',
@@ -23,16 +25,19 @@ export class SignatureBuilderComponent implements OnInit {
 
   private editSignature = new Signature();
   private currentSignatureId = '';
+  loggedInUser = new User();
   editor: any;
   loadedHtml = '';
   private subscriptions = new SubSink();
 
   constructor(private route: ActivatedRoute,
+              private authService: AuthenticationService,
               private signatureService: SignatureService,
               private notificationService: NotificationService) {
   }
 
   ngOnInit(): void {
+    this.loggedInUser = this.authService.getUserFromLocalStorage();
     this.subscriptions.add(
       this.route.params.subscribe(
         (response: Params) => {
@@ -51,7 +56,7 @@ export class SignatureBuilderComponent implements OnInit {
 
   public saveInlineHtml() {
     this.editSignature.htmlSignature = this.editor.runCommand('gjs-get-inlined-html');
-    const formData = this.signatureService.createSignatureFormData(this.editSignature.label, this.editSignature);
+    const formData = this.signatureService.createSignatureFormData(this.editSignature.label, this.loggedInUser.username, this.editSignature);
     this.subscriptions.add(
       this.signatureService.updateSignature(formData).subscribe(
         (response: Signature) => {
