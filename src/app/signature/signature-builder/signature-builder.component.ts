@@ -190,7 +190,7 @@ export class SignatureBuilderComponent implements OnInit {
               {
                 id: 'show-layers',
                 active: true,
-                label: '<i class="fa fa-layer-group"></i>',
+                label: '<i class="fa fa-th-list"></i>',
                 command: 'show-layers',
                 // Once activated disable the possibility to turn it off
                 togglable: false,
@@ -430,6 +430,14 @@ export class SignatureBuilderComponent implements OnInit {
       },
     });
     // Custom Components style
+    let bm = this.editor.BlockManager;
+    bm.get('quote').set({
+      label: 'Quote',
+      attributes: {
+        title: 'Updated title',
+        class: 'fa fa-quote-right'
+      }
+    })
 
   }
 }

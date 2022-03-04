@@ -54,7 +54,7 @@
             <div class="w-full pb-2 flex flex-col justify-center items-center">
               <h1 class="text-gray-700 font-bold">{{signature.createdByUser.firstName}} {{signature.createdByUser.lastName}}</h1>
               <h1 class="text-gray-500 text-sm"><span class="font-semibold">Created:</span> {{signature.creationDate | date: 'dd MMMM yyyy hh:mm'}}</h1>
-              <h1 class="text-gray-500 text-sm"><span class="font-semibold">Last updated:</span> {{signature?.lastModificationDateDisplay ? (signature?.lastModificationDateDisplay | date: 'dd/MM/yyyy hh:mm') : (signature.creationDate | date: 'dd MMMM yyyy hh:mm')}}</h1>
+              <h1 class="text-gray-500 text-sm"><span class="font-semibold">Last updated:</span> {{signature.lastModificationDateDisplay ? (signature?.lastModificationDateDisplay | date: 'dd MMMM yyyy hh:mm') : (signature.creationDate | date: 'dd MMMM yyyy hh:mm')}}</h1>
             </div>
           </div>
         </div>
@@ -156,6 +156,21 @@
                            [(ngModel)]="editSignature.label"
                            required
                            class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editSignatureForm.invalid && labelUpdateInput.touched && !labelUpdateInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                  </div>
+
+                  <div class="flex flex-row space-x-4 text-center mt-2">
+                    <div class="relative z-30 w-full mb-2">
+                      <label class="inline-flex items-center mt-2">
+                        <input
+                          type="checkbox"
+                          name="activeUpdate"
+                          id="activeUpdate"
+                          checked
+                          [ngModel]="false"
+                          ngModel #activeUpdateInput="ngModel"
+                          class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Active</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
 

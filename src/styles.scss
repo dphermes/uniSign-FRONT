@@ -1,5 +1,4 @@
 /* You can add global styles to this file, and also import other style files */
-@import 'https://use.fontawesome.com/releases/v5.8.1/css/all.css';
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -40,10 +39,4 @@
 .gjs-four-color,
 .gjs-four-color-h:hover {
   color: #58c9ec!important;
-}
-
-/* Icons */
-.fa-quote-right:before {
-  font-family: "Font Awesome 5 Free";
-  content: "\f10e"!important;
 }
