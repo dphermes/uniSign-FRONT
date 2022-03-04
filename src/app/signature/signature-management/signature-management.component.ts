@@ -112,7 +112,7 @@ export class SignatureManagementComponent implements OnInit, OnDestroy {
   onEditSignature(signature: Signature) {
     this.editSignature = signature;
     this.currentSignatureLabel = signature.label;
-    SignatureManagementComponent.clickButton('openEditModal');
+    SignatureManagementComponent.clickButton('openEditModal' + signature.signatureId);
   }
 
   /**
