@@ -11,6 +11,8 @@ import {NgForm} from "@angular/forms";
 import {CustomHttpResponse} from "../../model/custom-http-response";
 import {AuthenticationService} from "../../service/authentication.service";
 import {User} from "../../model/user";
+import {Agency} from "../../model/agency";
+import {AgencyService} from "../../service/agency.service";
 
 @Component({
   selector: 'app-signature-management',
@@ -25,8 +27,10 @@ export class SignatureManagementComponent implements OnInit, OnDestroy {
   loggedInUser = new User();
   showLoading = false;
   private subscriptions = new SubSink();
+  agencies: Agency[] = [];
 
   constructor(private signatureService: SignatureService,
+              private agencyService: AgencyService,
               public roleService: RoleService,
               public authService: AuthenticationService,
               private notificationService: NotificationService,
@@ -35,10 +39,29 @@ export class SignatureManagementComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getLoggedInUser();
     this.getSignatures();
+    this.getAgencies();
   }
 
   private getLoggedInUser() {
       this.loggedInUser = this.authService.getUserFromLocalStorage();
+  }
+
+  public getAgencies() {
+    this.showLoading = true;
+    this.subscriptions.add(
+      this.agencyService.getAgencies().subscribe(
+        (response: Agency[]) => {
+          this.agencies = response;
+          this.showLoading = false;
+          console.log(this.signatures);
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+          this.showLoading = false;
+        }
+
+      )
+    );
   }
 
   public getSignatures() {
@@ -83,6 +106,7 @@ export class SignatureManagementComponent implements OnInit, OnDestroy {
       (response: Signature) => {
           this.onCloseModals();
           this.sendNotification(NotificationType.SUCCESS, `${response.label} updated successfully`);
+          this.getSignatures();
         },
         (error: HttpErrorResponse) => {
           this.sendNotification(NotificationType.ERROR, error.error.message);

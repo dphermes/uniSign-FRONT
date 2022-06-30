@@ -18,6 +18,10 @@
   width: 24px;
 }
 
+.gjs-blocks-c .gjs-block {
+  border-radius: 10px;
+}
+
 
 .btn-save-data {
   padding: 3px 20px!important;
@@ -31,6 +35,14 @@
 }
 
 /* Colors */
+.gjs-one-bg {
+  background-color: #20354b!important;
+}
+.gjs-blocks-c .gjs-one-bg {
+  background-color: #FFFFFF!important;
+  color: #6b7280!important;
+}
+
 .gjs-three-color,
 .gjs-three-color-h:hover {
   color: #3c8da1!important;

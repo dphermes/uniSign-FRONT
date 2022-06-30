@@ -11,12 +11,14 @@ import {AuthGuard} from "./guard/auth.guard";
 import {NotificationModule} from "./notification.module";
 import {NotificationService} from "./service/notification.service";
 import {LoginComponent} from './login/login.component';
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {UserManagementComponent} from './user/user-management/user-management.component';
 import { RegisterComponent } from './register/register.component';
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
 import { SignatureManagementComponent } from './signature/signature-management/signature-management.component';
 import { SignatureBuilderComponent } from './signature/signature-builder/signature-builder.component';
+import { AgencyComponent } from './agency/agency.component';
+import { SignatureDetailsComponent } from './signature/signature-details/signature-details.component';
 
 @NgModule({
   declarations: [
@@ -26,15 +28,18 @@ import { SignatureBuilderComponent } from './signature/signature-builder/signatu
     RegisterComponent,
     UserProfileComponent,
     SignatureManagementComponent,
-    SignatureBuilderComponent
+    SignatureBuilderComponent,
+    AgencyComponent,
+    SignatureDetailsComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    NotificationModule,
-    FormsModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        NotificationModule,
+        FormsModule,
+        ReactiveFormsModule
+    ],
   providers: [
     AuthenticationService,
     UserService,

@@ -48,6 +48,14 @@ export class UserService {
   }
 
   /**
+   * Update a user service (http call)
+   * @return User: updated user or HttpErrorResponse
+   */
+  public updateNewWayUser(user: User): Observable<User> {
+    return this.http.post<User>(`${this.host}/user/update`, user);
+  }
+
+  /**
    * Reset user's password service (http call)
    * @return User: updated user or HttpErrorResponse
    */
@@ -107,6 +115,8 @@ export class UserService {
     formData.append('username', user.username);
     formData.append('email', user.email);
     formData.append('role', user.role);
+    // @ts-ignore
+    formData.append('agencyLabel', user.agency.label);
     formData.append('profileImage', profileImage);
     formData.append('isActive', JSON.stringify(user.active));
     formData.append('isNonLocked', JSON.stringify(user.notLocked));

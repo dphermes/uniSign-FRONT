@@ -1,0 +1,320 @@
+<section class="p-4">
+  <div class="w-full bg-white rounded-xl flex flex-row-reverse p-2 mb-4 gap-4">
+    <button (click)="getAgencies(true)" class="bg-cyan-900 text-white rounded px-4 py-2">
+      <svg *ngIf="!showLoading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+
+      <svg *ngIf="showLoading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </button>
+    <button *ngIf="roleService.isAdminOrManager" (click)="onOpenModal('agencyAddModal')" class="bg-pink-600 text-white hover:bg-pink-700 rounded-full px-4 py-2 inline-flex">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+      </svg> Add Agency
+    </button>
+    <form #searchForm="ngForm" class="right-0 relative text-teal-700">
+      <input name="searchTerm" ngModel (ngModelChange)="searchAgency(searchForm.value.searchTerm)" type="search" id="searchTerm" placeholder="Search" class="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none">
+      <button class="absolute right-0 top-0 mt-3 mr-4">
+        <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 56.966 56.966" width="512px" height="512px">
+          <path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+  <div class="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div *ngFor="let agency of agencies" class="bg-[#20354b] rounded-2xl px-8 py-6 shadow-lg">
+      <div class="relative flex items-center justify-between">
+        <span class="text-gray-400 text-sm">Agence</span>
+        <span *ngIf="roleService.isAdminOrManager" class="text-emerald-400 cursor-pointer" (click)="onOpenModal('agencyDropDown' + agency.agencyId)">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+          </svg>
+        </span>
+
+        <div id="modalOverlay" (click)="onCloseModals()"
+             class="fixed inset-0 h-full w-full z-20" style="display: none"></div>
+
+        <div id="agencyDropDown{{agency?.agencyId}}"
+             class="absolute right-0 top-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-20" style="display: none">
+          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white cursor-pointer" (click)="onEditAgency(agency)">Edit</a>
+          <button [hidden]="true" class="hidden" id="openEditModal{{agency.agencyId}}" (click)="onOpenModal('agencyEditModal'+agency.agencyId)"></button>
+          <a *ngIf="roleService.isAdmin || roleService.isSuperAdmin" class="block px-4 py-2 text-sm text-red-500 hover:bg-[#20354b] cursor-pointer" (click)="onOpenModal('agencyDeleteModal' + agency.agencyId)">Delete Agency</a>
+        </div>
+      </div>
+
+
+      <div class="mt-8 ">
+        <h2 class="text-white font-bold text-2xl tracking-wide">{{agency?.label}}</h2>
+        <span class="text-white block mt-6" *ngIf="agency?.addressComplement == 'null' || agency?.addressComplement == null"> </span>
+        <span class="text-white block">{{agency?.address}}</span>
+        <span class="text-white block" *ngIf="agency?.addressComplement !== 'null' && agency?.addressComplement !== null">{{agency?.addressComplement}}</span>
+        <span class="text-white block">{{agency?.zipCode}} {{agency?.city | uppercase}}</span>
+      </div>
+
+
+      <div class="h-1 w-full bg-black mt-8 rounded-full">
+        <div class="h-1 rounded-full w-2/5 bg-yellow-500 "></div>
+      </div>
+      <div *ngIf="roleService.isAdminOrManager" class="mt-3 text-white text-sm">
+        <span class="font-semibold">Agency Id : </span>
+        <a href="/agency/profile/{{agency.agencyId}}">
+          <span class="text-gray-400">{{agency?.agencyId}}</span>
+        </a>
+      </div>
+
+      <!-- Edit Agency Modal -->
+      <div *ngIf="roleService.isAdminOrManager" id="agencyEditModal{{agency.agencyId}}" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+        <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100">
+          <div
+            class="relative bg-white shadow-lg rounded-lg text-gray-900 z-30">
+            <header class="flex flex-col justify-center items-center p-3 text-emerald-500">
+              <div class="flex justify-center w-28 h-28 border-4 border-emerald-500 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <h2 class="font-semibold text-2xl">Edit {{agency.label}}</h2>
+            </header>
+            <main>
+              <form #editAgencyForm="ngForm" (ngSubmit)="updateAgency()">
+                <div class="p-4">
+
+                  <div class="grid grid-cols-15 mt-5">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Label</label>
+                      <span *ngIf="editAgencyForm.invalid && labelUpdateInput.touched && !labelUpdateInput.value" class="text-sm text-red-600" id="labelUpdateError">Label required</span>
+                    </div>
+                    <input type="text"
+                           id="labelUpdate"
+                           name="labelUpdate"
+                           placeholder=" "
+                           #labelUpdateInput="ngModel"
+                           [(ngModel)]="agency.label"
+                           required
+                           class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editAgencyForm.invalid && labelUpdateInput.touched && !labelUpdateInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                  </div>
+
+                  <div class="grid grid-cols-15 mt-5">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Address</label>
+                      <span *ngIf="editAgencyForm.invalid && addressUpdateInput.touched && !addressUpdateInput.value" class="text-sm text-red-600" id="addressUpdateError">Address required</span>
+                    </div>
+                    <input type="text"
+                           id="addressUpdate"
+                           name="addressUpdate"
+                           placeholder=" "
+                           #addressUpdateInput="ngModel"
+                           [(ngModel)]="agency.address"
+                           required
+                           class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editAgencyForm.invalid && addressUpdateInput.touched && !addressUpdateInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                  </div>
+
+                  <div class="grid grid-cols-15 mt-5">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Address Complement</label>
+                    </div>
+                    <input type="text"
+                           id="addressComplementUpdate"
+                           name="addressComplementUpdate"
+                           placeholder=" "
+                           #addressComplementUpdateInput="ngModel"
+                           [(ngModel)]="agency.addressComplement"
+                           class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 border-blue-300"/>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                    <div class="grid grid-cols-1">
+                      <div class="inline-block">
+                        <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Zip Code</label>
+                        <span *ngIf="editAgencyForm.invalid && zipCodeUpdateInput.touched && !zipCodeUpdateInput.value" class="text-sm text-red-600" id="zipCodeUpdateError">Zip Code required</span>
+                      </div>
+                      <input type="text"
+                             id="zipCodeUpdate"
+                             name="zipCodeUpdate"
+                             placeholder=" "
+                             #zipCodeUpdateInput="ngModel"
+                             [(ngModel)]="agency.zipCode"
+                             required
+                             class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editAgencyForm.invalid && zipCodeUpdateInput.touched && !zipCodeUpdateInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                    </div>
+                    <div class="grid grid-cols-1">
+                      <div class="inline-block">
+                        <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">City</label>
+                        <span *ngIf="editAgencyForm.invalid && cityUpdateInput.touched && !cityUpdateInput.value" class="text-sm text-red-600" id="cityUpdateError">Last name required</span>
+                      </div>
+                      <input type="text"
+                             id="cityUpdate"
+                             name="cityUpdate"
+                             placeholder=" "
+                             #cityUpdateInput="ngModel"
+                             [(ngModel)]="agency.city"
+                             required
+                             class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editAgencyForm.invalid && cityUpdateInput.touched && !cityUpdateInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                    </div>
+                  </div>
+                </div>
+
+                <footer class="flex justify-center bg-transparent mt-6">
+                  <button (click)="onCloseModals()" type="button"
+                          class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    Cancel
+                  </button>
+                  <button type="submit"
+                          [disabled]="editAgencyForm.invalid"
+                          class="bg-emerald-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-emerald-600 disabled:bg-emerald-300 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    Confirm
+                  </button>
+                </footer>
+              </form>
+            </main>
+          </div>
+        </div>
+      </div>
+      <!-- END Edit Agency Modal -->
+
+      <!-- Delete Agency Modal -->
+      <div *ngIf="roleService.isAdmin" id="agencyDeleteModal{{agency.agencyId}}" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+        <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100 z-30">
+          <div
+            class="relative bg-white shadow-lg rounded-lg text-slate-600 z-30">
+            <header class="flex flex-col justify-center items-center p-3 text-red-500">
+              <div class="flex justify-center w-28 h-28 border-4 border-red-500 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6" />
+                </svg>
+              </div>
+              <h2 class="font-semibold text-2xl">Delete {{agency.label}}</h2>
+            </header>
+            <main class="p-3 text-center">
+              <p>
+                Are you sure you want to delete <span class="font-semibold">{{agency.label}}</span> from agencies ?
+              </p>
+              <p class="text-red-500 font-semibold">This action is irreversible</p>
+            </main>
+            <footer class="flex justify-center bg-transparent mt-6">
+              <button (click)="onCloseModals()" type="button"
+                      class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                Cancel
+              </button>
+              <button (click)="onDeleteAgency(agency.label)"
+                      class="bg-red-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                Confirm
+              </button>
+            </footer>
+          </div>
+        </div>
+      </div>
+      <!-- END Delete Agency Modal -->
+
+    </div>
+
+    <!-- Add Agency Modal -->
+    <div *ngIf="roleService.isAdminOrManager" id="agencyAddModal" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+      <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100">
+        <div
+          class="relative bg-white shadow-lg rounded-lg text-gray-900 z-30">
+          <header class="flex flex-col justify-center items-center p-3 text-emerald-500">
+            <div class="flex justify-center w-28 h-28 border-4 border-emerald-500 rounded-full mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+            </div>
+            <h2 class="font-semibold text-2xl">Add new agency</h2>
+          </header>
+          <main>
+            <form #addAgencyForm="ngForm" (ngSubmit)="onAddNewAgency(addAgencyForm)">
+              <div class="p-4">
+
+                <div class="grid grid-cols-15 mt-5">
+                  <div class="inline-block">
+                    <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Label</label>
+                    <span *ngIf="addAgencyForm.invalid && label.touched && !label.value" class="text-sm text-red-600" id="labelError">Label required</span>
+                  </div>
+                  <input type="text"
+                         id="label"
+                         name="label"
+                         placeholder=" "
+                         ngModel #label="ngModel"
+                         required
+                         class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addAgencyForm.invalid && label.touched && !label.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                </div>
+
+                <div class="grid grid-cols-15 mt-5">
+                  <div class="inline-block">
+                    <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Address</label>
+                    <span *ngIf="addAgencyForm.invalid && address.touched && !address.value" class="text-sm text-red-600" id="addressError">Address required</span>
+                  </div>
+                  <input type="text"
+                         id="address"
+                         name="address"
+                         placeholder=" "
+                         ngModel #address="ngModel"
+                         required
+                         class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addAgencyForm.invalid && address.touched && !address.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                </div>
+
+                <div class="grid grid-cols-15 mt-5">
+                  <div class="inline-block">
+                    <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Address Complement</label>
+                  </div>
+                  <input type="text"
+                         id="addressComplement"
+                         name="addressComplement"
+                         placeholder=" "
+                         ngModel #addressComplement="ngModel"
+                         class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 border-blue-300"/>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                  <div class="grid grid-cols-1">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Zip Code</label>
+                      <span *ngIf="addAgencyForm.invalid && zipCodeInput.touched && !zipCodeInput.value" class="text-sm text-red-600" id="zipCodeError">Zip Code required</span>
+                    </div>
+                    <input type="text"
+                           id="zipCode"
+                           name="zipCode"
+                           placeholder=" "
+                           ngModel #zipCodeInput="ngModel"
+                           required
+                           class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addAgencyForm.invalid && zipCodeInput.touched && !zipCodeInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                  </div>
+                  <div class="grid grid-cols-1">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">City</label>
+                      <span *ngIf="addAgencyForm.invalid && cityInput.touched && !cityInput.value" class="text-sm text-red-600" id="cityError">Last name required</span>
+                    </div>
+                    <input type="text"
+                           id="city"
+                           name="city"
+                           placeholder=" "
+                           ngModel #cityInput="ngModel"
+                           required
+                           class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addAgencyForm.invalid && cityInput.touched && !cityInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                  </div>
+                </div>
+              </div>
+
+              <footer class="flex justify-center bg-transparent mt-6">
+                <button (click)="onCloseModals()" type="button"
+                        class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                  Cancel
+                </button>
+                <button type="submit"
+                        [disabled]="addAgencyForm.invalid"
+                        class="bg-emerald-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-emerald-600 disabled:bg-emerald-300 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                  Confirm
+                </button>
+              </footer>
+            </form>
+          </main>
+        </div>
+      </div>
+    </div>
+    <!-- END Add Agency Modal -->
+
+  </div>
+</section>

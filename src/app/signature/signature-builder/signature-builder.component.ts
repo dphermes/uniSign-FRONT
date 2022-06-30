@@ -15,6 +15,7 @@ import {HttpErrorResponse} from "@angular/common/http";
 import {NotificationType} from "../../enum/notification-type.enum";
 import {User} from "../../model/user";
 import {AuthenticationService} from "../../service/authentication.service";
+import {SignatureVersion} from "../../model/signatureVersion";
 
 @Component({
   selector: 'app-signature-builder',
@@ -23,7 +24,7 @@ import {AuthenticationService} from "../../service/authentication.service";
 })
 export class SignatureBuilderComponent implements OnInit {
 
-  private editSignature = new Signature();
+  private editSignatureVersion = new SignatureVersion();
   private currentSignatureId = '';
   loggedInUser = new User();
   editor: any;
@@ -41,12 +42,12 @@ export class SignatureBuilderComponent implements OnInit {
     this.subscriptions.add(
       this.route.params.subscribe(
         (response: Params) => {
-          this.currentSignatureId = response['signatureId'];
+          this.currentSignatureId = response['signatureVersionId'];
         }
       ),
-      this.signatureService.getSignatureById(this.currentSignatureId).subscribe(
-        (response: Signature) => {
-          this.editSignature = response;
+      this.signatureService.getSignatureVersionById(this.currentSignatureId).subscribe(
+        (response: SignatureVersion) => {
+          this.editSignatureVersion = response;
           this.loadedHtml = response.htmlSignature;
           this.uniSignBuilderInit();
         }
@@ -54,9 +55,9 @@ export class SignatureBuilderComponent implements OnInit {
     );
   }
 
-  public saveInlineHtml() {
-    this.editSignature.htmlSignature = this.editor.runCommand('gjs-get-inlined-html');
-    const formData = this.signatureService.createSignatureFormData(this.editSignature.label, this.loggedInUser.username, this.editSignature);
+  public onSaveInlineHtml() {
+    this.editSignatureVersion.htmlSignature = this.editor.runCommand('gjs-get-inlined-html');
+    const formData = this.signatureService.createSignatureVersionFormData(this.loggedInUser.username, this.editSignatureVersion);
     this.subscriptions.add(
       this.signatureService.updateSignature(formData).subscribe(
         (response: Signature) => {
@@ -130,25 +131,6 @@ export class SignatureBuilderComponent implements OnInit {
       layerManager: {
         appendTo: '.layers-container'
       },
-      deviceManager: {
-        appendTo: '.blocks-container',
-        devices: [
-          {
-            name: 'Desktop',
-            width: '', // default size
-          },
-          {
-            name: 'Tablet',
-            width: '680px', // this value will be used on canvas width
-            widthMedia: '740px', // this value will be used in CSS @media
-          },
-          {
-            name: 'Mobile',
-            width: '320px', // this value will be used on canvas width
-            widthMedia: '480px', // this value will be used in CSS @media
-          }
-        ]
-      },
       // Avoid any default panel
       panels: {
         defaults: [
@@ -202,32 +184,6 @@ export class SignatureBuilderComponent implements OnInit {
                 command: 'show-styles',
                 togglable: false,
               },
-              {
-                id: 'panel-devices',
-                el: '.panel__devices',
-                buttons: [
-                  {
-                    id: 'device-desktop',
-                    label: 'D',
-                    command: 'set-device-desktop',
-                    active: true,
-                    togglable: false,
-                  },
-                  {
-                    id: 'device-tablet',
-                    label: 'T',
-                    command: 'set-device-tablet',
-                    active: true,
-                    togglable: false,
-                  },
-                  {
-                    id: 'device-mobile',
-                    label: 'M',
-                    command: 'set-device-mobile',
-                    togglable: false,
-                  }
-                ],
-              }
             ],
           }
         ]
@@ -352,15 +308,6 @@ export class SignatureBuilderComponent implements OnInit {
       attributes: { title: 'Redo' }
     });
     // Define commands
-    this.editor.Commands.add('set-device-desktop', {
-      run: (editor: { setDevice: (arg0: string) => any; }) => editor.setDevice('Desktop')
-    });
-    this.editor.Commands.add('set-device-tablet', {
-      run: (editor: { setDevice: (arg0: string) => any; }) => editor.setDevice('Tablet')
-    });
-    this.editor.Commands.add('set-device-mobile', {
-      run: (editor: { setDevice: (arg0: string) => any; }) => editor.setDevice('Mobile')
-    });
     this.editor.Commands.add('show-blocks', {
       getRowEl(editor: any) {
         return editor.getContainer().closest('.editor-row');
@@ -431,13 +378,56 @@ export class SignatureBuilderComponent implements OnInit {
     });
     // Custom Components style
     let bm = this.editor.BlockManager;
-    bm.get('quote').set({
-      label: 'Quote',
-      attributes: {
-        title: 'Updated title',
-        class: 'fa fa-quote-right'
-      }
-    })
+    bm.get('button').set({
+      content: {
+        type: 'link',
+        content: '<a class="button">Button</a>',
+        style: { padding: '10px 20px',' background-color': '#006fb9', color: 'white', 'text-align': 'center' }
+      },
+      attributes: {class:'gjs-fonts gjs-f-button'}
+    });
+    const blockFirstName = bm.add('FIRST-NAME', {
+      // Your block properties...
+      type: 'span',
+      label: 'First Name',
+      content: '<span id="firstName44">#FIRST_NAME#</span> ',
+      attributes: {class:'gjs-fonts gjs-f-text'}
+    });
+    const blockLastName = bm.add('LAST-NAME', {
+      // Your block properties...
+      type: 'span',
+      label: 'Last Name',
+      content: '<span id="lastName44">#LAST_NAME#</span> ',
+      attributes: {class:'gjs-fonts gjs-f-text'}
+    });
+    const blockAgency = bm.add('AGENCY', {
+      // Your block properties...
+      type: 'span',
+      label: 'Agency',
+      content: '<span id="agency44">#AGENCY#</span> ',
+      attributes: {class:'gjs-fonts gjs-f-text'}
+    });
+    const blockPosition = bm.add('JOB', {
+      // Your block properties...
+      type: 'span',
+      label: 'Job position',
+      content: '<span id="agency44">#POSITION#</span> ',
+      attributes: {class:'gjs-fonts gjs-f-text'}
+    });
+    const blockPhone = bm.add('PHONE', {
+      // Your block properties...
+      type: 'span',
+      label: 'Phone Number',
+      content: '<span id="phoneNum44">#00.00.00.00.00#</span>',
+      attributes: {class:'gjs-fonts gjs-f-text'}
+    });
+    const blockEvent = bm.add('EVENT-MSG', {
+      // Your block properties...
+      label: 'Event Message',
+      content: '<span id="event44">#EVENT_MESSAGE#</span>',
+      attributes: {class:'gjs-fonts gjs-f-text'}
+    });
+
 
   }
 }

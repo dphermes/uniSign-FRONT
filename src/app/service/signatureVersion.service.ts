@@ -5,12 +5,11 @@ import {Observable} from "rxjs";
 import {Signature} from "../model/signature";
 import {CustomHttpResponse} from "../model/custom-http-response";
 import {User} from "../model/user";
-import {SignatureVersion} from "../model/signatureVersion";
 
 @Injectable({
   providedIn: 'root'
 })
-export class SignatureService {
+export class SignatureVersionService {
 
   private host = environment.apiUrl;
 
@@ -31,21 +30,8 @@ export class SignatureService {
   public getSignatureById(signatureId: string): Observable<Signature> {
     return this.http.get<Signature>(`${this.host}/signature/find/${signatureId}`);
   }
-  /**
-   * Fetch a signature searched by id
-   * @param signatureId string: signature's id to fetch
-   */
-  public getSignatureVersionByParentSignatureId(signatureId: string): Observable<SignatureVersion[]> {
-    return this.http.get<SignatureVersion[]>(`${this.host}/signature-version/find/signature/${signatureId}`);
-  }
-
-  public getSignatureVersionById(versionId: string): Observable<SignatureVersion> {
-    return this.http.get<SignatureVersion>(`${this.host}/signature-version/find/${versionId}`);
-  }
 
   public addSignature(formData: FormData): Observable<Signature> {
-    console.log('FormData in AddSign service')
-    console.log(Array.from(formData))
     return this.http.post<Signature>(`${this.host}/signature/add`, formData);
   }
 
@@ -64,25 +50,10 @@ export class SignatureService {
     formData.append('label', signature.label);
     formData.append('isActive', JSON.stringify(signature.active));
     formData.append('htmlSignature', signature.htmlSignature);
-    formData.append('applyToAgencies', JSON.stringify(signature.applyToAgencies));
     if (signature.active) {
       formData.append('status', 'active');
     } else {
       formData.append('status', 'inactive');
-    }
-    formData.append('agencyLabel', 'Nantes');
-    return formData;
-  }
-
-  public createSignatureVersionFormData(userName: string, signatureVersion: SignatureVersion): FormData {
-    const formData = new FormData();
-    formData.append('userName', userName);
-    formData.append('isActive', JSON.stringify(signatureVersion.active));
-    formData.append('htmlSignature', signatureVersion.htmlSignature);
-    if (signatureVersion.isValidatedByManager) {
-      formData.append('isValidatedByManager', 'true');
-    } else {
-      formData.append('status', 'false');
     }
     formData.append('agencyLabel', 'Nantes');
     return formData;

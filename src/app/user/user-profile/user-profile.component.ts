@@ -10,7 +10,9 @@ import {FileUploadStatus} from "../../model/file-upload.status";
 import {ModalService} from "../../service/modal.service";
 import {RoleService} from "../../service/role.service";
 import {SubSink} from "subsink";
-import {AppComponent} from "../../app.component";
+import {Agency} from "../../model/agency";
+import {AgencyService} from "../../service/agency.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-user-profile',
@@ -19,6 +21,7 @@ import {AppComponent} from "../../app.component";
 })
 export class UserProfileComponent implements OnInit, OnDestroy {
 
+  userForm: FormGroup;
   user = new User();
   loggedInUser = new User();
   editUser = new User();
@@ -28,14 +31,29 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   public fileStatus = new FileUploadStatus();
   usernameParam = '';
   isloggedInUser = false;
+  agencies: Agency[] = [];
+  selectedAgency = new Agency();
 
-  constructor(private authService: AuthenticationService,
+  constructor(private formBuilder: FormBuilder,
+              private authService: AuthenticationService,
               public roleService: RoleService,
               private userService: UserService,
+              private agencyService: AgencyService,
               private notificationService: NotificationService,
               private modalService: ModalService,
               private route: ActivatedRoute,
               private router: Router) {
+    this.userForm = formBuilder.group({
+      firstName: '',
+      lastName: '',
+      username: '',
+      profileImage: '',
+      email: '',
+      agency: new Agency(),
+      role: '',
+      isActive: true,
+      isNotLocked: true
+    })
     this.subscriptions.add(
       this.route.params.subscribe(
         params => this.usernameParam = params.username
@@ -51,6 +69,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           (response: User) => {
             this.user = response
             this.isloggedInUser = this.loggedInUser.username === response.username;
+            console.log('HERE');
+            console.log(this.user);
+            this.initUserForm()
           },
           (error: HttpErrorResponse) => {
             this.sendNotification(NotificationType.ERROR, error.error.message);
@@ -60,7 +81,43 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     } else {
       this.isloggedInUser = true;
       this.user = this.loggedInUser;
+      this.initUserForm()
+      console.log('THERE');
+      console.log(this.user);
     }
+    this.getAgencies();
+  }
+
+  initUserForm(): void {
+    console.log('User from init');
+    console.log(this.user);
+    this.userForm.get('agency')?.setValue(this.user.agency);
+    console.log(this.selectedAgency);
+    this.userForm = this.formBuilder.group({
+      firstName: [this.user.firstName, Validators.required],
+      lastName: [this.user.lastName, Validators.required],
+      username: [this.user.username, Validators.required],
+      profileImage: [this.profilePicture],
+      email: [this.user.email, Validators.pattern('^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$')],
+      agency: [this.user.agency],
+      role: [this.user.role],
+      isActive: [this.user.active],
+      isNotLocked: [this.user.notLocked]
+    });
+  }
+
+  public getAgencies() {
+    this.subscriptions.add(
+      this.agencyService.getAgencies().subscribe(
+        (response: Agency[]) => {
+          this.agencies = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        }
+
+      )
+    );
   }
 
   /**
@@ -112,6 +169,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
    */
   onEditUser(editUser: User) {
     this.editUser = editUser;
+    console.log(this.editUser);
     this.currentUsername = editUser.username;
     UserProfileComponent.clickButton('openEditModal');
   }
@@ -119,22 +177,33 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   /**
    * Update user's info in the database
    */
-  updateUser(): void {
-    // @ts-ignore
-    const formData = this.userService.createUserFormData(this.currentUsername, this.editUser, this.profilePicture);
+  onSaveUser(user: User): void {
+    user.firstName = this.userForm.get('firstName')?.value;
+    user.lastName = this.userForm.get('lastName')?.value;
+    user.username = this.userForm.get('username')?.value;
+    user.profileImageUrl = this.userForm.get('profileImage')?.value;
+    user.email = this.userForm.get('email')?.value;
+    user.agency = this.userForm.get('agency')?.value,
+    user.role = this.userForm.get('role')?.value;
+    user.active = this.userForm.get('isActive')?.value;
+    user.notLocked = this.userForm.get('isNotLocked')?.value;
+
+    console.log('user in save method');
+    console.log(user);
+
     this.subscriptions.add(
-      this.userService.updateUser(formData).subscribe(
-        (response: User) => {
-          this.onCloseModals();
-          this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully`);
-          this.router.navigateByUrl('user/profile/' + response.username).then();
-          // this.getUsers(false);
-        },
-        (error: HttpErrorResponse) => {
-          this.sendNotification(NotificationType.ERROR, error.error.message);
-        }
-      )
-    );
+        this.userService.updateNewWayUser(user).subscribe(
+          (response: User) => {
+            this.onCloseModals();
+            this.sendNotification(NotificationType.SUCCESS, `${response.firstName} updated successfully`);
+            this.router.navigateByUrl('user/profile/' + response.username).then();
+            // this.getUsers(false);
+          },
+          (error: HttpErrorResponse) => {
+            this.sendNotification(NotificationType.ERROR, error.error.message);
+          }
+        )
+      );
   }
 
   /**
@@ -218,5 +287,4 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
 }

@@ -15,7 +15,6 @@ import {AppComponent} from "../app.component";
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
-
   showLoading = false;
   private subscriptions = new SubSink();
 

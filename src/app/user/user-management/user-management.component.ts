@@ -11,6 +11,8 @@ import {CustomHttpResponse} from "../../model/custom-http-response";
 import {ModalService} from "../../service/modal.service";
 import {RoleService} from "../../service/role.service";
 import {SubSink} from "subsink";
+import {Agency} from "../../model/agency";
+import {AgencyService} from "../../service/agency.service";
 
 @Component({
   selector: 'app-user-management',
@@ -25,9 +27,11 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   showLoading = false;
   private subscriptions = new SubSink();
   profilePicture!: File;
+  agencies: Agency[] = [];
 
   constructor(private router: Router,
               private userService: UserService,
+              private agencyService: AgencyService,
               private authService: AuthenticationService,
               public roleService: RoleService,
               private notificationService: NotificationService,
@@ -36,6 +40,21 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getUsers(false);
+    this.getAgencies();
+  }
+
+  public getAgencies() {
+    this.subscriptions.add(
+      this.agencyService.getAgencies().subscribe(
+        (response: Agency[]) => {
+          this.agencies = response;
+        },
+        (errorResponse: HttpErrorResponse) => {
+          this.sendNotification(NotificationType.ERROR, errorResponse.error.message);
+        }
+
+      )
+    );
   }
 
   /**

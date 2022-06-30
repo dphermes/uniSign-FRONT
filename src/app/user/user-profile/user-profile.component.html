@@ -14,8 +14,10 @@
             <div class="absolute -mt-20 h-40 w-40 rounded-full overflow-hidden border-2 border-gray-400 bg-[#20354b]">
               <img id="profilePicturePreview" src="{{user.profileImageUrl}}" alt="..." class="h-full w-full object-cover align-middle0">
             </div>
-            <div *ngIf="isloggedInUser || roleService.isAdminOrManager" (click)="onUpdateProfilePicture()" class="absolute h-8 w-8 mt-10 ml-28 mx-auto text-center rounded-full overflow-hidden bg-[#20354b] hover:bg-green-600 border-2 border-gray-400 cursor-pointer">
-              <i class="fas fa-pencil-alt text-white align-middle"></i>
+            <div *ngIf="isloggedInUser || roleService.isAdminOrManager" (click)="onUpdateProfilePicture()" class="absolute h-8 w-8 mt-10 ml-28 mx-auto text-center text-white rounded-full overflow-hidden bg-[#20354b] hover:bg-green-600 border-2 border-gray-400 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="margin-left:4px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
             </div>
             <!-- Hidden Form to change Profile Picture -->
             <form enctype="multipart/form-data" class="hidden">
@@ -73,7 +75,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            KMCL, St Sébastien sur Loire
+            KMCL, {{user?.agency?.label}}
           </div>
           <div class="mb-2 text-blueGray-600 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-cyan-500 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,9 +128,9 @@
 
                 <div class="h-56 mx-4 w-5/6 bg-[#20354b] rounded-3xl shadow-md sm:w-80 sm:mx-0">
                   <div class="h-1/2 w-full flex justify-between items-baseline px-3 py-5">
-                    <h1 class="text-white">Signature Bourges</h1>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <h1 class="text-white">Signature BBQ</h1>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
 
@@ -165,9 +167,9 @@
 
                 <div class="h-56 mx-4 w-5/6 bg-[#20354b] rounded-3xl shadow-md sm:w-80 sm:mx-0">
                   <div class="h-1/2 w-full flex justify-between items-baseline px-3 py-5">
-                    <h1 class="text-white">Signature St Sébastien</h1>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <h1 class="text-white">Signature Nantes</h1>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
 
@@ -205,8 +207,8 @@
                 <div class="h-56 mx-4 w-5/6 bg-[#20354b] rounded-3xl shadow-md sm:w-80 sm:mx-0">
                   <div class="h-1/2 w-full flex justify-between items-baseline px-3 py-5">
                     <h1 class="text-white">Signature Noël</h1>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
 
@@ -253,7 +255,7 @@
         <h2 class="font-semibold text-2xl">Edit {{user.firstName}} {{user.lastName}}</h2>
       </header>
       <main>
-        <form #editUserForm="ngForm" (ngSubmit)="updateUser()">
+        <form [formGroup]="userForm" (ngSubmit)="onSaveUser(user)">
           <div class="p-4">
             <div class="relative z-30 mb-4 w-full flex items-center space-x-6">
               <div class="shrink-0">
@@ -265,7 +267,7 @@
                   type="file"
                   name="profileImage"
                   id="profileImage"
-                  [(ngModel)]="editUser.profileImageUrl"
+                  formControlName="profileImage"
                   class="block w-full text-sm text-slate-500
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-full file:border-0
@@ -282,30 +284,28 @@
               <div class="grid grid-cols-1">
                 <div class="inline-block">
                   <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">First name</label>
-                  <span *ngIf="editUserForm.invalid && firstNameInput.touched && !firstNameInput.value" class="text-sm text-red-600" id="firstNameError">First name required</span>
+                  <span *ngIf="userForm.invalid && userForm.controls['firstName'].invalid && userForm.controls['firstName'].touched" class="text-sm text-red-600" id="firstNameError">First name required</span>
                 </div>
                 <input type="text"
                        id="firstName"
                        name="firstName"
                        placeholder=" "
-                       #firstNameInput="ngModel"
-                       [(ngModel)]="editUser.firstName"
+                       formControlName="firstName"
                        required
-                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editUserForm.invalid && firstNameInput.touched && !firstNameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{userForm.invalid && userForm.controls['firstName'].invalid && userForm.controls['firstName'].touched ? 'border-red-500' : 'border-blue-300'}}"/>
               </div>
               <div class="grid grid-cols-1">
                 <div class="inline-block">
                   <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Last name</label>
-                  <span *ngIf="editUserForm.invalid && lastNameInput.touched && !lastNameInput.value" class="text-sm text-red-600" id="lastNameError">Last name required</span>
+                  <span *ngIf="userForm.invalid && userForm.controls['lastName'].invalid && userForm.controls['lastName'].touched" class="text-sm text-red-600" id="lastNameError">Last name required</span>
                 </div>
                 <input type="text"
                        id="lastName"
                        name="lastName"
                        placeholder=" "
-                       #lastNameInput="ngModel"
-                       [(ngModel)]="editUser.lastName"
+                       formControlName="lastName"
                        required
-                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editUserForm.invalid && lastNameInput.touched && !lastNameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{userForm.invalid && userForm.controls['lastName'].invalid && userForm.controls['lastName'].touched ? 'border-red-500' : 'border-blue-300'}}"/>
               </div>
             </div>
 
@@ -313,44 +313,55 @@
               <div class="grid grid-cols-1">
                 <div class="inline-block">
                   <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Username</label>
-                  <span *ngIf="editUserForm.invalid && usernameInput.touched && !usernameInput.value" class="text-sm text-red-600" id="usernameError">Username required</span>
+                  <span *ngIf="userForm.invalid && userForm.controls['username'].invalid && userForm.controls['username'].touched" class="text-sm text-red-600" id="usernameError">Username required</span>
                 </div>
                 <input type="text"
                        id="username"
                        name="username"
                        placeholder=" "
-                       #usernameInput="ngModel"
-                       [(ngModel)]="editUser.username"
+                       formControlName="username"
                        required
-                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editUserForm.invalid && usernameInput.touched && !usernameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{userForm.invalid && userForm.controls['username'].invalid && userForm.controls['username'].touched ? 'border-red-500' : 'border-blue-300'}}"/>
               </div>
               <div class="grid grid-cols-1">
                 <div class="inline-block">
                   <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Email</label>
-                  <span *ngIf="editUserForm.invalid && emailInput.touched && !emailInput.value" class="text-sm text-red-600" id="emailError">Email required</span>
+                  <span *ngIf="userForm.invalid && userForm.controls['email'].invalid && userForm.controls['email'].touched" class="text-sm text-red-600" id="emailError">Email required</span>
                 </div>
                 <input type="email"
                        id="email"
                        name="email"
                        placeholder=" "
-                       #emailInput="ngModel"
-                       [(ngModel)]="editUser.email"
+                       formControlName="email"
                        required
-                       class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{editUserForm.invalid && emailInput.touched && !emailInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                       class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{userForm.invalid && userForm.controls['email'].invalid && userForm.controls['email'].touched ? 'border-red-500' : 'border-blue-300'}}"/>
               </div>
+            </div>
+
+            <div *ngIf="roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
+              <div class="inline-block">
+                <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Agency</label>
+                <span *ngIf="userForm.invalid && userForm.controls['agency'].invalid && userForm.controls['agency'].touched" class="text-sm text-red-600" id="agencyError">Agency required</span>
+              </div>
+              <select name="agency"
+                      id="agency"
+                      formControlName="agency"
+                      on
+                      onclick="this.setAttribute('agency', this.value);"
+                      class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 {{userForm.invalid && userForm.controls['agency'].invalid && userForm.controls['agency'].touched ? 'border-red-500' : 'border-blue-300'}}">
+                <option *ngFor="let agency of agencies" [ngValue]="agency">{{agency.label | uppercase}}</option>
+              </select>
             </div>
 
             <div *ngIf="(roleService.isAdmin && editUser.role != 'ROLE_SUPER_ADMIN') || (roleService.isSuperAdmin)" class="grid grid-cols-1 mt-5 text-slate-500">
               <div class="inline-block">
                 <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Role</label>
-                <span *ngIf="editUserForm.invalid && roleInput.touched && !roleInput.value" class="text-sm text-red-600" id="roleError">Role required</span>
+                <span *ngIf="userForm.invalid && userForm.controls['role'].invalid && userForm.controls['role'].touched" class="text-sm text-red-600" id="roleError">Role required</span>
               </div>
               <select name="role"
                       id="role"
-                      #roleInput="ngModel"
-                      value="{{editUser.role}}"
-                      onclick="this.setAttribute('value', this.value);"
-                      [(ngModel)]="editUser.role"
+                      formControlName="role"
+                      onclick="this.setAttribute('role', this.value);"
                       class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400">
                 <option value="ROLE_USER" selected>USER</option>
                 <option value="ROLE_MANAGER">MANAGER</option>
@@ -363,9 +374,8 @@
               <input type="text"
                      name="role"
                      required
-                     #roleInput="ngModel"
+                     formControlName="role"
                      readonly
-                     [(ngModel)]="editUser.role"
                      class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500">
             </div>
 
@@ -376,7 +386,7 @@
                     type="checkbox"
                     name="active"
                     id="active"
-                    [(ngModel)]="editUser.active"
+                    formControlName="isActive"
                     class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-slate-500">Active</span>
                 </label>
               </div>
@@ -386,7 +396,7 @@
                     type="checkbox"
                     name="notLocked"
                     id="notLocked"
-                    [(ngModel)]="editUser.notLocked"
+                    formControlName="isNotLocked"
                     class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-slate-500">Unlocked</span>
                 </label>
               </div>
@@ -399,7 +409,7 @@
               Cancel
             </button>
             <button type="submit"
-                    [disabled]="editUserForm.invalid"
+                    [disabled]="userForm.invalid"
                     class="bg-emerald-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-emerald-600 disabled:bg-emerald-300 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
               Confirm
             </button>

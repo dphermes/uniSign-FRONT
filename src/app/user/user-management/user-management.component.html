@@ -1,11 +1,19 @@
 <section class="p-4">
   <div class="w-full bg-white rounded-xl flex flex-row-reverse p-2 mb-4 gap-4">
     <button (click)="getUsers(true)" class="bg-cyan-900 text-white rounded px-4 py-2">
-      <i class="fas fa-sync-alt" *ngIf="!showLoading"></i>
-      <i class="fas fa-sync-alt fa-spin" *ngIf="showLoading"></i>
+      <svg *ngIf="!showLoading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+
+      <svg *ngIf="showLoading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
     </button>
-    <button *ngIf="roleService.isAdminOrManager" (click)="onOpenModal('userAddModal')" class="bg-pink-600 text-white hover:bg-pink-700 rounded-full px-4 py-2">
-      <i class="fas fa-plus"></i> Add User
+    <button *ngIf="roleService.isAdminOrManager" (click)="onOpenModal('userAddModal')" class="bg-pink-600 text-white hover:bg-pink-700 rounded-full px-4 py-2 inline-flex">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+      </svg> Add User
     </button>
     <form #searchForm="ngForm" class="right-0 relative text-teal-700">
       <input name="searchTerm" ngModel (ngModelChange)="searchUsers(searchForm.value.searchTerm)" type="search" id="searchTerm" placeholder="Search" class="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none">
@@ -175,6 +183,23 @@
                              class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addUserForm.invalid && emailInput.touched && !emailInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
 
                     </div>
+                  </div>
+
+                  <div *ngIf="roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Agency</label>
+                      <span *ngIf="addUserForm.invalid && agencyInput.touched && !agencyInput.value" class="text-sm text-red-600" id="agencyError">Agency required</span>
+                    </div>
+                    <select name="agency"
+                            id="agency"
+                            #agencyInput="ngModel"
+                            value=""
+                            [(ngModel)]="editUser.agency"
+                            onclick="this.setAttribute('value', this.value);"
+                            class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 {{addUserForm.invalid && agencyInput.touched && !agencyInput.value ? 'border-red-500' : 'border-blue-300'}}">
+                      <option *ngIf="editUser.agency != null" selected>{{editUser.agency.label}}</option>
+                      <option *ngFor="let agency of agencies" value="{{agency.label}}">{{agency.label | uppercase}}</option>
+                    </select>
                   </div>
 
                   <div *ngIf="roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
