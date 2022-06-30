@@ -1,1 +1,54 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "angular-notifier/styles";
+
+.gjs-cv-canvas {
+  top: 0;
+  width: 100%!important;
+  height: 100%;
+}
+
+.gjs-rte-action svg {
+  height: 24px;
+  width: 24px;
+}
+
+.gjs-blocks-c .gjs-block {
+  border-radius: 10px;
+}
+
+
+.btn-save-data {
+  padding: 3px 20px!important;
+  background: #58c9ec!important;
+}
+.btn-save-data:hover {
+  background: #3c8da1!important;
+}
+.btn-save-data .small {
+  font-size: 0.8em;
+}
+
+/* Colors */
+.gjs-one-bg {
+  background-color: #20354b!important;
+}
+.gjs-blocks-c .gjs-one-bg {
+  background-color: #FFFFFF!important;
+  color: #6b7280!important;
+}
+
+.gjs-three-color,
+.gjs-three-color-h:hover {
+  color: #3c8da1!important;
+}
+
+.gjs-four-color,
+.gjs-four-color-h:hover {
+  color: #58c9ec!important;
+}

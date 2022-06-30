@@ -1,0 +1,96 @@
+@import 'grapesjs/dist/css/grapes.min.css';
+
+.unisign__wrapper {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+/* Let's highlight canvas boundaries */
+#gjs {
+  border: 3px solid #444;
+  margin: 0; height: 100%; overflow: auto;
+}
+
+/* Reset some default styling */
+.gjs-cv-canvas {
+  background-color: rgba(0,0,0,.15);
+  box-sizing: border-box;
+  height: calc(100% - 110px);
+  bottom: 0;
+  overflow: hidden;
+  z-index: 1;
+  position: absolute;
+  left: 0;
+  top: 40px;
+}
+
+/* Panels */
+.panel__top {
+  padding: 0;
+  width: 100%;
+  display: flex;
+  position: initial;
+  justify-content: center;
+  justify-content: space-between;
+}
+.panel__basic-actions {
+  position: initial;
+}
+.panel__basic-custom-options {
+  position: initial;
+}
+.panel__devices {
+  position: initial;
+}
+.gjs-pn-devices-c {
+  position: initial;
+}
+
+/* Canvas */
+.editor-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+
+.editor-canvas {
+  flex-grow: 1;
+}
+
+.panel__right {
+  flex-basis: 230px;
+  position: relative;
+  overflow-y: auto;
+  height: calc(100vh - 108px);
+}
+
+.panel__switcher {
+  position: initial;
+}
+
+
+
+/* Blocks */
+.gjs-block {
+  width: auto;
+  height: auto;
+  min-height: auto;
+}
+
+/* Action buttons */
+.gjs-rte-action svg {
+  height: 24px;
+  width: 24px;
+}
+
+/* Colors */
+.gjs-three-color,
+.gjs-three-color-h:hover {
+  color: #3c8da1!important;
+}
+
+.gjs-four-color,
+.gjs-four-color-h:hover {
+  color: #58c9ec!important;
+}

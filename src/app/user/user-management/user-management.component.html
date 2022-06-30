@@ -1,0 +1,349 @@
+<section class="p-4">
+  <div class="w-full bg-white rounded-xl flex flex-row-reverse p-2 mb-4 gap-4">
+    <button (click)="getUsers(true)" class="bg-cyan-900 text-white rounded px-4 py-2">
+      <svg *ngIf="!showLoading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+
+      <svg *ngIf="showLoading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </button>
+    <button *ngIf="roleService.isAdminOrManager" (click)="onOpenModal('userAddModal')" class="bg-pink-600 text-white hover:bg-pink-700 rounded-full px-4 py-2 inline-flex">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+      </svg> Add User
+    </button>
+    <form #searchForm="ngForm" class="right-0 relative text-teal-700">
+      <input name="searchTerm" ngModel (ngModelChange)="searchUsers(searchForm.value.searchTerm)" type="search" id="searchTerm" placeholder="Search" class="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none">
+      <button class="absolute right-0 top-0 mt-3 mr-4">
+        <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 56.966 56.966" width="512px" height="512px">
+      <path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z"/>
+    </svg>
+      </button>
+    </form>
+  </div>
+  <div class="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div *ngFor="let user of users" class="bg-[#20354b] rounded-2xl px-8 py-6 shadow-lg">
+      <div class="relative flex items-center justify-between">
+        <span class="text-gray-400 text-sm">{{user?.lastLoginDateDisplay ? (user?.lastLoginDateDisplay | date: 'dd/MM/yyyy hh:mm') : 'Never logged in'}}</span>
+        <span *ngIf="roleService.isAdminOrManager" class="text-emerald-400 cursor-pointer" (click)="onOpenModal('userDropDown' + user.userId)">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+          </svg>
+        </span>
+
+        <div id="modalOverlay" (click)="onCloseModals()"
+             class="fixed inset-0 h-full w-full z-20" style="display: none"></div>
+
+        <div id="userDropDown{{user?.userId}}"
+             class="absolute right-0 top-0 mt-2 w-48 bg-white rounded-md overflow-hidden shadow-xl z-20" style="display: none">
+          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white" href="user/profile/{{user?.username}}">Profile</a>
+          <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-[#20354b] hover:text-white cursor-pointer" (click)="onOpenModal('userResetPasswordModal' + user.userId)">Reset password</a>
+          <a *ngIf="(roleService.isAdmin && user.role != 'ROLE_SUPER_ADMIN') || (roleService.isSuperAdmin)" class="block px-4 py-2 text-sm text-red-500 hover:bg-[#20354b] cursor-pointer" (click)="onOpenModal('userDeleteModal' + user.userId)">Delete User</a>
+        </div>
+      </div>
+      <div class="mt-6 w-fit mx-auto">
+        <a href="/user/profile/{{user.username}}">
+          <div class="cursor-pointer rounded-full overflow-hidden border-2 w-28 h-28">
+            <img id="manageUserProfilePicture{{user.userId}}" src="{{user?.profileImageUrl}}" class="h-full w-full object-cover" alt="{{user?.username}} profile picture" srcset="">
+          </div>
+        </a>
+      </div>
+
+      <div class="mt-8 ">
+        <h2 class="text-white font-bold text-2xl tracking-wide">{{user?.firstName}}<br/> {{user?.lastName}}</h2>
+      </div>
+      <div *ngIf="roleService.isAdminOrManager" class="flex justify-between">
+        <form #isActiveForm="ngForm" [hidden]="true" class="hidden" (ngSubmit)="updateUser()">
+          <input type="checkbox"
+                 name="active"
+                 [(ngModel)]="user.active">
+          <button type="submit" id="isActiveSubmit{{user.userId}}"></button>
+        </form>
+        <p (click)="changeUserStatus(user, 'isActive')" class="{{user.active ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
+          {{user.active ? 'Active' : 'Inactive'}}
+        </p>
+
+        <form #isNotLockedForm="ngForm" [hidden]="true" class="hidden" (ngSubmit)="updateUser()">
+          <input type="checkbox"
+                 name="active"
+                 [(ngModel)]="user.notLocked">
+          <button type="submit" id="isNotLockedSubmit{{user.userId}}"></button>
+        </form>
+        <p (click)="changeUserStatus(user, 'isNotLocked')" class="{{user.notLocked ? 'text-emerald-400' : 'text-red-500'}} cursor-pointer font-semibold mt-2.5" >
+          {{user.notLocked ? 'Not Locked' : 'Locked'}}
+        </p>
+      </div>
+
+      <div class="h-1 w-full bg-black mt-8 rounded-full">
+        <div class="h-1 rounded-full w-2/5 bg-yellow-500 "></div>
+      </div>
+      <div *ngIf="roleService.isAdminOrManager" class="mt-3 text-white text-sm">
+        <span class="font-semibold">User Id : </span>
+        <a href="/user/profile/{{user.username}}">
+          <span class="text-gray-400">{{user?.userId}}</span>
+        </a>
+      </div>
+
+      <!-- Add User Modal -->
+      <div *ngIf="roleService.isAdminOrManager" id="userAddModal" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+        <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100">
+          <div
+            class="relative bg-white shadow-lg rounded-lg text-gray-900 z-30">
+            <header class="flex flex-col justify-center items-center p-3 text-emerald-500">
+              <div class="flex justify-center w-28 h-28 border-4 border-emerald-500 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+              </div>
+              <h2 class="font-semibold text-2xl">Add new user</h2>
+            </header>
+            <main>
+              <form #addUserForm="ngForm" (ngSubmit)="onAddNewUser(addUserForm)">
+                <div class="p-4">
+                  <div class="relative z-30 mb-4 w-full flex items-center space-x-6">
+                    <div class="shrink-0">
+                      <img id="profilePicturePreview" class="h-16 w-16 object-cover rounded-full border-2 border-cyan-700" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1361&q=80" alt="Current profile photo" />
+                    </div>
+                    <label class="block" for="profileImage">
+                      <span class="sr-only">Choose profile picture</span>
+                      <input
+                        type="file"
+                        name="profileImage"
+                        id="profileImage"
+                        ngModel #profileImageInput="ngModel"
+                        class="block w-full text-sm text-slate-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-violet-50 file:text-violet-700
+                        hover:file:bg-violet-100"
+                        accept="image/*"
+                        (change)="onProfileImageChange($event)"
+                      />
+                    </label>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                    <div class="grid grid-cols-1">
+                      <div class="inline-block">
+                        <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">First name</label>
+                        <span *ngIf="addUserForm.invalid && firstNameInput.touched && !firstNameInput.value" class="text-sm text-red-600" id="firstNameError">First name required</span>
+                      </div>
+                      <input type="text"
+                             id="firstName"
+                             name="firstName"
+                             placeholder=" "
+                             ngModel #firstNameInput="ngModel"
+                             required
+                             class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addUserForm.invalid && firstNameInput.touched && !firstNameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                    </div>
+                    <div class="grid grid-cols-1">
+                      <div class="inline-block">
+                        <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Last name</label>
+                        <span *ngIf="addUserForm.invalid && lastNameInput.touched && !lastNameInput.value" class="text-sm text-red-600" id="lastNameError">Last name required</span>
+                      </div>
+                      <input type="text"
+                             id="lastName"
+                             name="lastName"
+                             placeholder=" "
+                             ngModel #lastNameInput="ngModel"
+                             required
+                             class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addUserForm.invalid && lastNameInput.touched && !lastNameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                    <div class="grid grid-cols-1">
+                      <div class="inline-block">
+                        <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Username</label>
+                        <span *ngIf="addUserForm.invalid && usernameInput.touched && !usernameInput.value" class="text-sm text-red-600" id="usernameError">Username required</span>
+                      </div>
+                      <input type="text"
+                             id="username"
+                             name="username"
+                             placeholder=" "
+                             ngModel #usernameInput="ngModel"
+                             required
+                             class="py-2 rounded-xl border-2 border-blue-300 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addUserForm.invalid && usernameInput.touched && !usernameInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+                    </div>
+                    <div class="grid grid-cols-1">
+                      <div class="inline-block">
+                        <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Email</label>
+                        <span *ngIf="addUserForm.invalid && emailInput.touched && !emailInput.value" class="text-sm text-red-600" id="emailError">Email required</span>
+                      </div>
+                      <input type="email"
+                             id="email"
+                             name="email"
+                             placeholder=" "
+                             ngModel #emailInput="ngModel"
+                             required
+                             class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500 {{addUserForm.invalid && emailInput.touched && !emailInput.value ? 'border-red-500' : 'border-blue-300'}}"/>
+
+                    </div>
+                  </div>
+
+                  <div *ngIf="roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Agency</label>
+                      <span *ngIf="addUserForm.invalid && agencyInput.touched && !agencyInput.value" class="text-sm text-red-600" id="agencyError">Agency required</span>
+                    </div>
+                    <select name="agency"
+                            id="agency"
+                            #agencyInput="ngModel"
+                            value=""
+                            [(ngModel)]="editUser.agency"
+                            onclick="this.setAttribute('value', this.value);"
+                            class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 {{addUserForm.invalid && agencyInput.touched && !agencyInput.value ? 'border-red-500' : 'border-blue-300'}}">
+                      <option *ngIf="editUser.agency != null" selected>{{editUser.agency.label}}</option>
+                      <option *ngFor="let agency of agencies" value="{{agency.label}}">{{agency.label | uppercase}}</option>
+                    </select>
+                  </div>
+
+                  <div *ngIf="roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
+                    <div class="inline-block">
+                      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Role</label>
+                      <span *ngIf="addUserForm.invalid && roleInput.touched && !roleInput.value" class="text-sm text-red-600" id="roleError">Role required</span>
+                    </div>
+                    <select name="role"
+                            id="role"
+                            value=""
+                            ngModel #roleInput="ngModel"
+                            onclick="this.setAttribute('value', this.value);"
+                            class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 {{addUserForm.invalid && roleInput.touched && !roleInput.value ? 'border-red-500' : 'border-blue-300'}}">
+                      <option value="ROLE_USER" selected>USER</option>
+                      <option value="ROLE_MANAGER">MANAGER</option>
+                      <option value="ROLE_ADMIN">ADMIN</option>
+                      <option *ngIf="roleService.isSuperAdmin" value="ROLE_SUPER_ADMIN">SUPER ADMIN</option>
+                    </select>
+                  </div>
+                  <div *ngIf="!roleService.isAdmin" class="grid grid-cols-1 mt-5 text-slate-500">
+                    <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold mr-2">Role</label>
+                    <input type="text"
+                           name="role"
+                           required
+                           ngModel="ROLE_USER" #roleInput="ngModel"
+                           readonly
+                           value="ROLE_USER"
+                           class="py-2 rounded-xl border-2 mt-1 focus:outline-none focus:border-teal-400 text-slate-500">
+                  </div>
+
+                  <div class="flex flex-row space-x-4 text-center mt-2">
+                    <div class="relative z-30 w-full mb-2">
+                      <label class="inline-flex items-center mt-2">
+                        <input
+                          type="checkbox"
+                          name="active"
+                          id="active"
+                          checked
+                          [ngModel]="true"
+                          ngModel #activeInput="ngModel"
+                          class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Active</span>
+                      </label>
+                    </div>
+                    <div class="relative z-30 w-full">
+                      <label class="inline-flex items-center mt-2">
+                        <input
+                          type="checkbox"
+                          name="notLocked"
+                          id="notLocked"
+                          checked
+                          [ngModel]="true"
+                          ngModel #notLockedInput="ngModel"
+                          class="form-checkbox h-4 w-4 text-cyan-500 focus:outline-none"><span class="text-sm ml-2 text-gray-700">Unlocked</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <footer class="flex justify-center bg-transparent mt-6">
+                  <button (click)="onCloseModals()" type="button"
+                          class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    Cancel
+                  </button>
+                  <button type="submit"
+                          [disabled]="addUserForm.invalid"
+                          class="bg-emerald-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-emerald-600 disabled:bg-emerald-300 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                    Confirm
+                  </button>
+                </footer>
+              </form>
+            </main>
+          </div>
+        </div>
+      </div>
+      <!-- END Add User Modal -->
+
+      <!-- Delete User Modal -->
+      <div *ngIf="roleService.isAdmin" id="userDeleteModal{{user.userId}}" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+        <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100 z-30">
+          <div
+            class="relative bg-white shadow-lg rounded-lg text-slate-600 z-30">
+            <header class="flex flex-col justify-center items-center p-3 text-red-500">
+              <div class="flex justify-center w-28 h-28 border-4 border-red-500 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6" />
+                </svg>
+              </div>
+              <h2 class="font-semibold text-2xl">Delete {{user.firstName}} {{user.lastName}}</h2>
+            </header>
+            <main class="p-3 text-center">
+              <p>
+                Are you sure you want to delete <span class="font-semibold">{{user.firstName}} {{user.lastName}}</span> from users ?
+              </p>
+              <p class="text-red-500 font-semibold">This action is irreversible</p>
+            </main>
+            <footer class="flex justify-center bg-transparent mt-6">
+              <button (click)="onCloseModals()" type="button"
+                class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                Cancel
+              </button>
+              <button (click)="onDeleteUser(user.username)"
+                class="bg-red-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-red-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                Confirm
+              </button>
+            </footer>
+          </div>
+        </div>
+      </div>
+      <!-- END Delete User Modal -->
+
+      <!-- Reset User Password Modal -->
+      <div  *ngIf="roleService.isAdminOrManager" id="userResetPasswordModal{{user.userId}}" class="fixed inset-0 w-full h-full z-10 bg-black bg-opacity-50 duration-300 overflow-y-auto" style="display: none">
+        <div class="relative sm:w-3/4 md:w-1/2 lg:w-1/3 mx-2 sm:mx-auto my-10 opacity-100 z-30">
+          <div
+            class="relative bg-white shadow-lg rounded-lg text-slate-600 z-30">
+            <header class="flex flex-col justify-center items-center p-3 text-emerald-500">
+              <div class="flex justify-center w-28 h-28 border-4 border-emerald-500 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+              </div>
+              <h2 class="font-semibold text-2xl">Reset {{user.firstName}} {{user.lastName}}'s password</h2>
+            </header>
+            <main class="p-3 text-center">
+              <p>
+                Are you sure you want to reset <span class="font-semibold">{{user.firstName}} {{user.lastName}}</span>'s password ?
+              </p>
+              <p>An email with the new password will be sent to <span class="font-semibold">{{user.email}}</span></p>
+            </main>
+            <footer class="flex justify-center bg-transparent mt-6">
+              <button (click)="onCloseModals()" type="button"
+                      class="bg-[#20354b] font-semibold text-white py-3 w-full rounded-bl-md hover:bg-cyan-900 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                Cancel
+              </button>
+              <button (click)="onResetPassword(user.email, user.userId)"
+                      class="bg-emerald-500 font-semibold text-white py-3 w-full rounded-br-md hover:bg-emerald-600 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300">
+                Confirm
+              </button>
+            </footer>
+          </div>
+        </div>
+      </div>
+      <!-- END Reset User Password Modal -->
+
+    </div>
+  </div>
+</section>
